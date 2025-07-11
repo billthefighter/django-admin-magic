@@ -2,11 +2,35 @@
 
 [![Tests](.github/badges/tests-badge.svg)](https://github.com/billthefighter/django-admin-magic/actions)
 [![Coverage](.github/badges/coverage-badge.svg)](https://codecov.io/gh/billthefighter/django-admin-magic)
+[![Test Matrix](https://img.shields.io/badge/test%20matrix-23%20combinations-brightgreen)](https://github.com/billthefighter/django-admin-magic/actions)
 [![PyPI version](https://badge.fury.io/py/django-admin-magic.svg)](https://badge.fury.io/py/django-admin-magic)
 [![Python versions](https://img.shields.io/pypi/pyversions/django-admin-magic.svg)](https://pypi.org/project/django-admin-magic/)
 [![Django versions](https://img.shields.io/pypi/djversions/django-admin-magic.svg)](https://pypi.org/project/django-admin-magic/)
 
 A simple Django app to automatically register your models with the admin site.
+
+## Tested Dependencies
+
+This package is thoroughly tested against the following dependency combinations:
+
+| Django Version | Python 3.8 | Python 3.9 | Python 3.10 | Python 3.11 | Python 3.12 |
+|----------------|------------|------------|-------------|-------------|-------------|
+| **3.2**        | ✅         | ✅         | ✅          | ✅          | ✅          |
+| **4.0**        | ✅         | ✅         | ✅          | ✅          | ✅          |
+| **4.1**        | ✅         | ✅         | ✅          | ✅          | ✅          |
+| **4.2**        | ✅         | ✅         | ✅          | ✅          | ✅          |
+| **5.0**        | ❌         | ❌         | ✅          | ✅          | ✅          |
+
+**Note**: Django 5.0 requires Python 3.10+ and is not compatible with Python 3.8 or 3.9.
+
+### Continuous Integration
+
+Our CI pipeline automatically tests all compatible combinations on every push and pull request. The test matrix includes:
+- **5 Django versions** (3.2, 4.0, 4.1, 4.2, 5.0)
+- **5 Python versions** (3.8, 3.9, 3.10, 3.11, 3.12)
+- **Code coverage** reporting
+- **Linting** with ruff
+- **Security scanning** with bandit
 
 ## Why?
 Sometimes you're working on a django app and you just wanna see the models, and you don't want to define a brand new admin instance every time, and you just want things to work and look at your data in the admin view. If so, this package is for you!
