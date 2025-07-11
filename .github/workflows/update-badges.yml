@@ -31,13 +31,23 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          uv run pytest --cov=src/django_admin_magic --cov-report=xml:coverage.xml --cov-report=term-missing
-          ls -la coverage.xml
+          echo "Current directory: $(pwd)"
+          echo "Listing files before tests:"
+          ls -la
+          echo "Running pytest..."
+          uv run pytest --cov=src/django_admin_magic --cov-report=xml:coverage.xml --cov-report=term-missing -v
+          echo "Listing files after tests:"
+          ls -la
+          echo "Looking for coverage files:"
+          find . -name "*.xml" -type f
 
       - name: Check for coverage.xml
         run: |
           if [ ! -f coverage.xml ]; then
             echo "coverage.xml not found!"
+            echo "Current directory: $(pwd)"
+            echo "All files in current directory:"
+            ls -la
             exit 1
           fi
 
