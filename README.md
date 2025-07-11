@@ -19,21 +19,21 @@ Sometimes you're working on a django app and you just wanna see the models, and 
 
 This package is thoroughly tested against the following dependency combinations:
 
-| Django Version | Python 3.8 | Python 3.9 | Python 3.10 | Python 3.11 | Python 3.12 |
-|----------------|------------|------------|-------------|-------------|-------------|
-| **3.2**        | ✅         | ✅         | ✅          | ✅          | ✅          |
-| **4.0**        | ✅         | ✅         | ✅          | ✅          | ✅          |
-| **4.1**        | ✅         | ✅         | ✅          | ✅          | ✅          |
-| **4.2**        | ✅         | ✅         | ✅          | ✅          | ✅          |
-| **5.0**        | ❌         | ❌         | ✅          | ✅          | ✅          |
+| Django Version | Python 3.10 | Python 3.11 | Python 3.12 |
+|----------------|-------------|-------------|-------------|
+| **3.2**        | ✅          | ✅          | ✅          |
+| **4.0**        | ✅          | ✅          | ✅          |
+| **4.1**        | ✅          | ✅          | ✅          |
+| **4.2**        | ✅          | ✅          | ✅          |
+| **5.0**        | ✅          | ✅          | ✅          |
 
-**Note**: Django 5.0 requires Python 3.10+ and is not compatible with Python 3.8 or 3.9.
+**Note**: This package requires Python 3.10+ due to its use of modern type hint syntax (union types with `|` operator). While Python 3.8 and 3.9 could be supported by using `typing.Union` and `typing.Optional`, we prefer the cleaner, more readable modern syntax introduced in Python 3.10.
 
 ### Continuous Integration
 
 The test matrix includes:
 - **5 Django versions** (3.2, 4.0, 4.1, 4.2, 5.0)
-- **5 Python versions** (3.8, 3.9, 3.10, 3.11, 3.12)
+- **3 Python versions** (3.10, 3.11, 3.12)
 - **Code coverage** reporting
 - **Linting** with ruff
 - **Security scanning** with bandit

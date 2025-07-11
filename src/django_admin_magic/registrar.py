@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Callable
-from typing import Any, Union, cast
+from typing import Any, cast
 
 from django.apps import apps
 from django.contrib import admin
@@ -21,9 +21,9 @@ from .utils import is_polymorphic_model, is_polymorphic_model_parent_model
 logger = logging.getLogger(__name__)
 
 # Model type definition for all models used in admin class
-InclusiveModelType = Union[type[models.Model], models.Model, PolymorphicModelBase, type[PolymorphicModelBase]]
+InclusiveModelType = type[models.Model] | models.Model | PolymorphicModelBase | type[PolymorphicModelBase]
 
-AdminClassType = Union[type[PolymorphicParentListAdmin], type[PolymorphicChildListAdmin], type[ListAdmin]]
+AdminClassType = type[PolymorphicParentListAdmin] | type[PolymorphicChildListAdmin] | type[ListAdmin]
 
 
 class AdminModelRegistrar:
@@ -217,13 +217,9 @@ class AdminModelRegistrar:
             A list with duplicates removed while preserving order
 
         """
-        if isinstance(tuple_or_list, list):
-            result = []
-            for item in tuple_or_list:
-                if item not in result:
-                    result.append(item)
-            return result
-        return self._tuple_list_handler(list(tuple_or_list))
+        if isinstance(tuple_or_list, tuple):
+            tuple_or_list = list(tuple_or_list)
+        return list(dict.fromkeys(tuple_or_list))
 
     def _verify_list_display_in_model(
         self,
