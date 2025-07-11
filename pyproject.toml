@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "setuptools-scm"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
@@ -7,7 +7,7 @@ packages = ["src/django_admin_magic"]
 
 [project]
 name = "django-admin-magic"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Automatic admin registration for Django projects."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -35,6 +35,10 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/billthefighter/django-admin-magic"
+
+[tool.setuptools_scm]
+version_scheme = "python-simplified-semver"
+local_scheme = "node-and-timestamp"
 
 [project.optional-dependencies]
 dev = [
