@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Callable
-from typing import Any, cast
+from typing import Any, Union, cast
 
 from django.apps import apps
 from django.contrib import admin
@@ -21,9 +21,9 @@ from .utils import is_polymorphic_model, is_polymorphic_model_parent_model
 logger = logging.getLogger(__name__)
 
 # Model type definition for all models used in admin class
-InclusiveModelType = type[models.Model] | models.Model | PolymorphicModelBase | type[PolymorphicModelBase]
+InclusiveModelType = Union[type[models.Model], models.Model, PolymorphicModelBase, type[PolymorphicModelBase]]
 
-AdminClassType = type[PolymorphicParentListAdmin] | type[PolymorphicChildListAdmin] | type[ListAdmin]
+AdminClassType = Union[type[PolymorphicParentListAdmin], type[PolymorphicChildListAdmin], type[ListAdmin]]
 
 
 class AdminModelRegistrar:
