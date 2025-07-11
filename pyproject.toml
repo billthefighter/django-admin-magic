@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-auto-admin"
+version = "0.1.0"
+description = "Automatic admin registration for Django projects."
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Lucas Whipple", email = "lucas@whipple.dev" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Django",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "django>=3.2",
+    "django-polymorphic>=3.0",
+    "pytest>=8.3.5",
+    "pytest-django>=4.11.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/lucaswhipple/django-auto-admin"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-django",
+    "pytest-cov",
+    "pytest-xdist",
+    "ruff",
+    "pre-commit",
+    "uv",
+    "mypy",
+    "bandit",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.test_settings"
+python_files = "tests.py test_*.py *_tests.py"
+pythonpath = [".", "src"]
+addopts = "--tb=short"
+markers = [
+    "django_db: marks tests as requiring database access",
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+] 
