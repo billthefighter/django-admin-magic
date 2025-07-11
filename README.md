@@ -1,7 +1,7 @@
 # Django Admin Magic
 
-[![Tests](.github/badges/tests-badge.svg)](https://github.com/lucaswhipple/django-admin-magic/actions)
-[![Coverage](.github/badges/coverage-badge.svg)](https://codecov.io/gh/lucaswhipple/django-admin-magic)
+[![Tests](.github/badges/tests-badge.svg)](https://github.com/billthefighter/django-admin-magic/actions)
+[![Coverage](.github/badges/coverage-badge.svg)](https://codecov.io/gh/billthefighter/django-admin-magic)
 [![PyPI version](https://badge.fury.io/py/django-admin-magic.svg)](https://badge.fury.io/py/django-admin-magic)
 [![Python versions](https://img.shields.io/pypi/pyversions/django-admin-magic.svg)](https://pypi.org/project/django-admin-magic/)
 [![Django versions](https://img.shields.io/pypi/djversions/django-admin-magic.svg)](https://pypi.org/project/django-admin-magic/)
