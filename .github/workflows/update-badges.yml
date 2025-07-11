@@ -31,7 +31,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        pytest --cov=src/django_admin_magic --cov-report=xml --cov-report=term-missing
+        uv run pytest --cov=src/django_admin_magic --cov-report=xml --cov-report=term-missing
 
     - name: Install badge generation tools
       run: |
@@ -40,8 +40,8 @@ jobs:
     - name: Generate badges
       run: |
         mkdir -p .github/badges
-        genbadge coverage -i coverage.xml -o .github/badges/coverage-badge.svg
-        genbadge tests -i coverage.xml -o .github/badges/tests-badge.svg
+        uv run genbadge coverage -i coverage.xml -o .github/badges/coverage-badge.svg
+        uv run genbadge tests -i coverage.xml -o .github/badges/tests-badge.svg
 
     - name: Commit and push badge updates
       run: |

@@ -52,7 +52,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest --cov=src/django_admin_magic --cov-report=xml --cov-report=term-missing
+        uv run pytest --cov=src/django_admin_magic --cov-report=xml --cov-report=term-missing
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -84,8 +84,8 @@ jobs:
 
     - name: Run linting
       run: |
-        ruff check .
-        ruff format --check .
+        uv run ruff check .
+        uv run ruff format --check .
 
   security:
     runs-on: ubuntu-latest
@@ -109,8 +109,8 @@ jobs:
 
     - name: Run security checks
       run: |
-        bandit -r src/ -f json -o bandit-report.json || true
-        bandit -r src/ -f txt -o bandit-report.txt
+        uv run bandit -r src/ -f json -o bandit-report.json || true
+        uv run bandit -r src/ -f txt -o bandit-report.txt
 
     - name: Upload security report
       uses: actions/upload-artifact@v4
@@ -144,11 +144,11 @@ jobs:
 
     - name: Generate coverage badge
       run: |
-        genbadge coverage -i coverage.xml -o coverage-badge.svg
+        uv run genbadge coverage -i coverage.xml -o coverage-badge.svg
 
     - name: Generate tests badge
       run: |
-        genbadge tests -i coverage.xml -o tests-badge.svg
+        uv run genbadge tests -i coverage.xml -o tests-badge.svg
 
     - name: Update badges in README
       run: |
