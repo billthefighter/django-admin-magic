@@ -8,8 +8,6 @@ from django.utils.functional import cached_property
 from django.utils.html import format_html
 from polymorphic.models import PolymorphicModel
 
-from .conf import app_settings
-
 logger = logging.getLogger(__name__)
 
 
@@ -22,6 +20,7 @@ def get_all_child_classes(cls: type) -> list[type]:
 
     Returns:
         List[Type]: A list of all direct and indirect subclasses of the given class.
+
     """
     child_classes = cls.__subclasses__()  # Get direct subclasses
     all_children = child_classes[:]  # Start with direct subclasses
@@ -48,39 +47,40 @@ def is_polymorphic_model_parent_model(cls):
 def is_linkify_function(field):
     """
     Check if a field is a linkify function (either linkify or linkify_gfk).
-    
+
     Args:
         field: The field to check
-        
+
     Returns:
         bool: True if the field is a linkify function, False otherwise
+
     """
     if not callable(field):
         return False
-    
+
     # Check if it's a linkify function by examining its function name or attributes
     # Both linkify and linkify_gfk functions have specific patterns
-    func_name = getattr(field, '__name__', '')
-    
+    func_name = getattr(field, "__name__", "")
+
     # Check for the specific function names used in linkify functions
-    if func_name in ('_linkify', '_linkify_gfk'):
+    if func_name in ("_linkify", "_linkify_gfk"):
         return True
-    
+
     # Additional check: look for the short_description attribute which is set on linkify functions
-    if hasattr(field, 'short_description') and hasattr(field, 'admin_order_field'):
+    if hasattr(field, "short_description") and hasattr(field, "admin_order_field"):
         return True
-    
+
     # Check if the function was created by our linkify functions by examining the closure
     try:
         # Get the function's code object to check if it contains linkify-specific patterns
-        if hasattr(field, '__code__'):
+        if hasattr(field, "__code__"):
             # This is a more robust way to detect our linkify functions
             # We can check if the function has the expected attributes
-            if hasattr(field, 'short_description') and hasattr(field, 'admin_order_field'):
+            if hasattr(field, "short_description") and hasattr(field, "admin_order_field"):
                 return True
     except (AttributeError, TypeError):
         pass
-    
+
     return False
 
 
@@ -114,70 +114,74 @@ def reorder_list_display_to_avoid_linkify_first(list_display):
 def create_auto_admin_registrar(app_label: str = None):
     """
     Create an auto admin registrar for the current app.
-    
+
     This function is designed to be used in admin.py files to automatically
     register all models in the current app with the admin site.
-    
+
     Args:
         app_label (str, optional): The app label to register. If None, will be
                                  automatically determined from the current package.
-    
+
     Returns:
         AdminModelRegistrar: The registrar instance
-        
+
     Example:
         # In your app's admin.py file:
         from django_admin_magic.utils import create_auto_admin_registrar
-        
+
         registrar = create_auto_admin_registrar()
         # All models in this app are now registered with the admin site
+
     """
     from .registrar import AdminModelRegistrar
-    
+
     if app_label is None:
         # Auto-determine app label from the current package
         import __package__
+
         app_label = __package__.rsplit(".", 1)[-1]
-    
+
     return AdminModelRegistrar.register_app(app_label)
 
 
 def create_auto_admin_registrar_for_apps(app_labels: list[str]):
     """
     Create an auto admin registrar for multiple apps.
-    
+
     Args:
         app_labels (list[str]): List of app labels to register
-        
+
     Returns:
         AdminModelRegistrar: The registrar instance
-        
+
     Example:
         # In your admin.py file:
         from django_admin_magic.utils import create_auto_admin_registrar_for_apps
-        
+
         registrar = create_auto_admin_registrar_for_apps(['myapp1', 'myapp2'])
+
     """
     from .registrar import AdminModelRegistrar
-    
+
     return AdminModelRegistrar.register_apps(app_labels)
 
 
 def create_auto_admin_registrar_for_all_apps():
     """
     Create an auto admin registrar that discovers and registers all apps.
-    
+
     Returns:
         AdminModelRegistrar: The registrar instance
-        
+
     Example:
         # In your admin.py file:
         from django_admin_magic.utils import create_auto_admin_registrar_for_all_apps
-        
+
         registrar = create_auto_admin_registrar_for_all_apps()
+
     """
     from .registrar import AdminModelRegistrar
-    
+
     return AdminModelRegistrar.register_all_discovered_apps()
 
 
@@ -201,7 +205,7 @@ class TimeLimitedPaginator(Paginator):
         try:
             with transaction.atomic(), connection.cursor() as cursor:
                 # Only set statement_timeout for PostgreSQL
-                if connection.vendor == 'postgresql':
+                if connection.vendor == "postgresql":
                     cursor.execute("SET LOCAL statement_timeout TO 1000;")
                 return super().count
         except OperationalError:
@@ -209,9 +213,9 @@ class TimeLimitedPaginator(Paginator):
                 # Obtain estimated values (only valid with PostgreSQL)
                 if not self.object_list.query.model:  # type: ignore
                     raise
-                
+
                 # Only use PostgreSQL-specific query for PostgreSQL
-                if connection.vendor == 'postgresql':
+                if connection.vendor == "postgresql":
                     cursor.execute(
                         "SELECT reltuples FROM pg_class WHERE relname = %s",
                         [self.object_list.query.model._meta.db_table],  # type: ignore
@@ -219,7 +223,7 @@ class TimeLimitedPaginator(Paginator):
                     res = cursor.fetchone()
                     if res:
                         return int(res[0])
-                
+
                 # For non-PostgreSQL databases, return a reasonable estimate
                 # or fall back to the actual count (which might be slow)
                 logger.warning(
@@ -232,12 +236,12 @@ class TimeLimitedPaginator(Paginator):
 @admin.action(description="Mark task as unsuccessful")
 def reset_success(modeladmin, request, queryset):
     # Handle both QuerySet and list objects
-    if hasattr(queryset, 'update'):
+    if hasattr(queryset, "update"):
         queryset.update(success=False)
     else:
         # For list objects, update each item individually
         for item in queryset:
-            if hasattr(item, 'success'):
+            if hasattr(item, "success"):
                 item.success = False
                 item.save()
 
@@ -284,6 +288,7 @@ def linkify_gfk(field_name):
 
     Returns:
         Callable: A function suitable for Django admin's list_display.
+
     """
 
     def _linkify_gfk(obj):
@@ -320,4 +325,4 @@ def linkify_gfk(field_name):
         _linkify_gfk.admin_order_field = field_name  # Attempt sorting - may depend on GFK setup
     except AttributeError:
         logger.warning(f"Could not set admin attributes on linkify_gfk function for {field_name}")
-    return _linkify_gfk 
+    return _linkify_gfk

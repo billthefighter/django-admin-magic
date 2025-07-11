@@ -20,4 +20,4 @@ ADMIN_TUPLE_ATTRIBUTES_TO_LIST = ["list_display", "list_filter", "search_fields"
 
 # Whether to reorder linkify fields to avoid them being first in list_display
 # This prevents issues with clicking on the first column in admin changelist views
-REORDER_LINKIFY_FIELDS = True 
+REORDER_LINKIFY_FIELDS = True

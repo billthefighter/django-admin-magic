@@ -2,9 +2,12 @@ import pytest
 from django.conf import settings
 from django.test import override_settings
 
-from django_admin_magic.conf import AppSettings, app_settings
 from django_admin_magic import defaults
-from django_admin_magic.utils import reorder_list_display_to_avoid_linkify_first, linkify
+from django_admin_magic.conf import AppSettings, app_settings
+from django_admin_magic.utils import (
+    linkify,
+    reorder_list_display_to_avoid_linkify_first,
+)
 
 
 @pytest.mark.django_db
@@ -25,21 +28,21 @@ class TestAppSettings:
     def test_getattr_with_default_setting(self):
         """Test that getattr falls back to defaults when setting not found."""
         settings_obj = AppSettings(prefix="NONEXISTENT_")
-        
+
         # Should fall back to the default
         assert settings_obj.DEFAULT_EXCLUDED_TERMS == defaults.DEFAULT_EXCLUDED_TERMS
 
     def test_getattr_with_nonexistent_setting(self):
         """Test that getattr raises AttributeError for nonexistent settings."""
         settings_obj = AppSettings(prefix="TEST_")
-        
+
         with pytest.raises(AttributeError):
             _ = settings_obj.NONEXISTENT_SETTING
 
     def test_getattr_with_empty_prefix(self):
         """Test that getattr works with empty prefix."""
         settings_obj = AppSettings(prefix="")
-        
+
         # Should work the same way
         assert settings_obj.DEFAULT_EXCLUDED_TERMS == defaults.DEFAULT_EXCLUDED_TERMS
 
@@ -57,16 +60,16 @@ class TestAppSettingsIntegration:
     def test_app_settings_fallback_to_defaults(self):
         """Test that app_settings falls back to defaults when setting not found."""
         # Remove any existing setting to test fallback
-        if hasattr(settings, 'AUTO_ADMIN_DEFAULT_EXCLUDED_TERMS'):
-            delattr(settings, 'AUTO_ADMIN_DEFAULT_EXCLUDED_TERMS')
-        
+        if hasattr(settings, "AUTO_ADMIN_DEFAULT_EXCLUDED_TERMS"):
+            delattr(settings, "AUTO_ADMIN_DEFAULT_EXCLUDED_TERMS")
+
         # Should use the default
         assert app_settings.DEFAULT_EXCLUDED_TERMS == defaults.DEFAULT_EXCLUDED_TERMS
 
     def test_app_settings_override_defaults(self):
         """Test that app_settings can override defaults."""
         custom_excluded_terms = ["custom1", "custom2"]
-        
+
         with override_settings(AUTO_ADMIN_DEFAULT_EXCLUDED_TERMS=custom_excluded_terms):
             assert app_settings.DEFAULT_EXCLUDED_TERMS == custom_excluded_terms
 
@@ -82,10 +85,10 @@ class TestDefaults:
 
     def test_defaults_has_required_settings(self):
         """Test that defaults module has all required settings."""
-        assert hasattr(defaults, 'APP_LABEL')
-        assert hasattr(defaults, 'DEFAULT_EXCLUDED_TERMS')
-        assert hasattr(defaults, 'DEFAULT_DO_NOT_REGISTER_FILTER_STRING_LIST')
-        assert hasattr(defaults, 'ADMIN_TUPLE_ATTRIBUTES_TO_LIST')
+        assert hasattr(defaults, "APP_LABEL")
+        assert hasattr(defaults, "DEFAULT_EXCLUDED_TERMS")
+        assert hasattr(defaults, "DEFAULT_DO_NOT_REGISTER_FILTER_STRING_LIST")
+        assert hasattr(defaults, "ADMIN_TUPLE_ATTRIBUTES_TO_LIST")
 
     def test_default_excluded_terms_is_list(self):
         """Test that DEFAULT_EXCLUDED_TERMS is a list."""
@@ -130,7 +133,7 @@ class TestConfigurationEdgeCases:
     def test_app_settings_with_complex_objects(self):
         """Test that app_settings handles complex objects correctly."""
         complex_object = {"key": "value", "list": [1, 2, 3]}
-        
+
         with override_settings(AUTO_ADMIN_COMPLEX_OBJECT=complex_object):
             assert app_settings.COMPLEX_OBJECT == complex_object
 
@@ -138,7 +141,7 @@ class TestConfigurationEdgeCases:
         """Test that app_settings is case sensitive."""
         with override_settings(AUTO_ADMIN_CASE_TEST="lowercase"):
             assert app_settings.CASE_TEST == "lowercase"
-            
+
             # Different case should not match
             with pytest.raises(AttributeError):
                 _ = app_settings.case_test
@@ -152,11 +155,8 @@ class TestConfigurationIntegration:
         """Test that different prefixes work independently."""
         settings1 = AppSettings(prefix="PREFIX1_")
         settings2 = AppSettings(prefix="PREFIX2_")
-        
-        with override_settings(
-            PREFIX1_CUSTOM_SETTING="value1",
-            PREFIX2_CUSTOM_SETTING="value2"
-        ):
+
+        with override_settings(PREFIX1_CUSTOM_SETTING="value1", PREFIX2_CUSTOM_SETTING="value2"):
             assert settings1.CUSTOM_SETTING == "value1"
             assert settings2.CUSTOM_SETTING == "value2"
 
@@ -164,7 +164,7 @@ class TestConfigurationIntegration:
         """Test that different AppSettings instances share the same defaults."""
         settings1 = AppSettings(prefix="PREFIX1_")
         settings2 = AppSettings(prefix="PREFIX2_")
-        
+
         # Both should get the same default value
         assert settings1.DEFAULT_EXCLUDED_TERMS == settings2.DEFAULT_EXCLUDED_TERMS
         assert settings1.DEFAULT_EXCLUDED_TERMS == defaults.DEFAULT_EXCLUDED_TERMS
@@ -172,17 +172,17 @@ class TestConfigurationIntegration:
     def test_app_settings_override_chain(self):
         """Test the override chain: Django settings -> defaults -> AttributeError."""
         settings_obj = AppSettings(prefix="TEST_")
-        
+
         # Test with setting in Django settings
         with override_settings(TEST_CUSTOM_SETTING="django_value"):
             assert settings_obj.CUSTOM_SETTING == "django_value"
-        
+
         # Test with setting only in defaults
         assert settings_obj.DEFAULT_EXCLUDED_TERMS == defaults.DEFAULT_EXCLUDED_TERMS
-        
+
         # Test with setting in neither
         with pytest.raises(AttributeError):
-            _ = settings_obj.NONEXISTENT_SETTING 
+            _ = settings_obj.NONEXISTENT_SETTING
 
 
 @pytest.mark.django_db
@@ -218,6 +218,7 @@ class TestConfiguration:
         """Test that REORDER_LINKIFY_FIELDS can be disabled via settings."""
         # Re-import to get updated settings
         from django_admin_magic.conf import app_settings as updated_settings
+
         assert updated_settings.REORDER_LINKIFY_FIELDS is False
 
     @override_settings(AUTO_ADMIN_REORDER_LINKIFY_FIELDS=True)
@@ -225,20 +226,21 @@ class TestConfiguration:
         """Test that REORDER_LINKIFY_FIELDS can be enabled via settings."""
         # Re-import to get updated settings
         from django_admin_magic.conf import app_settings as updated_settings
+
         assert updated_settings.REORDER_LINKIFY_FIELDS is True
 
     def test_reorder_linkify_fields_functionality(self):
         """Test that the reordering function works correctly."""
         linkify_func = linkify("parent")
-        
+
         # Test with linkify first
         original_list = [linkify_func, "name", "created_at"]
         reordered = reorder_list_display_to_avoid_linkify_first(original_list)
-        
+
         # Should reorder to move linkify after first non-linkify field
         assert reordered == ["name", linkify_func, "created_at"]
-        
+
         # Test with linkify not first (should not change)
         original_list2 = ["name", linkify_func, "created_at"]
         reordered2 = reorder_list_display_to_avoid_linkify_first(original_list2)
-        assert reordered2 == original_list2 
+        assert reordered2 == original_list2

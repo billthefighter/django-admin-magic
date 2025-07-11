@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Callable
-from typing import Any, Union, cast, List, Optional
+from typing import Any, Union, cast
 
 from django.apps import apps
 from django.contrib import admin
@@ -35,13 +35,19 @@ class AdminModelRegistrar:
         2.1. set defaults for fields to show up in admin(__init__ method of listadmin mixin)
     3. Modify fields with append methods once admin classes have been registered.
     #NOTE: This needs a fundamentally different approach. The Sync() idea is good, because
-    we need to make sure the instances and the adminclasses actually have the same attributes or you get errors like this:
-    <class 'django.forms.widgets.AdminClass_ProjectAlternateName'>: (admin.E108) The value of 'list_display[5]' refers to 'created_at', which is not a callable, an attribute of 'AdminClass_ProjectAlternateName', or an attribute or method on 'project_tracker.ProjectAlternateName'.
-    As of right now (this commit) all edits using the methods for the registrar are happenin on the widget, not the admin class.
-    They need to be syncd! And the sync code needs to be updated to sync changes from the instance to the admin class prototype.
+    # we need to make sure the instances and the adminclasses actually have the same
+    # attributes or you get errors like this:
+    # <class 'django.forms.widgets.AdminClass_ProjectAlternateName'>: (admin.E108) The
+    # value of 'list_display[5]' refers to 'created_at', which is not a callable, an
+    # attribute of 'AdminClass_ProjectAlternateName', or an attribute or method on
+    # 'project_tracker.ProjectAlternateName'.
+    # As of right now (this commit) all edits using the methods for the registrar are
+    # happenin on the widget, not the admin class.
+    # They need to be syncd! And the sync code needs to be updated to sync changes from
+    # the instance to the admin class prototype.
     """
 
-    def __init__(self, app_label: Optional[str] = None, app_labels: Optional[List[str]] = None, auto_discover: bool = False):
+    def __init__(self, app_label: str | None = None, app_labels: list[str] | None = None, auto_discover: bool = False):
         """
         Initialize the registrar for specific Django app(s).
 
@@ -49,6 +55,7 @@ class AdminModelRegistrar:
             app_label (str, optional): The label of a single Django app to register models for.
             app_labels (List[str], optional): List of Django app labels to register models for.
             auto_discover (bool): Whether to auto-discover and register all installed apps.
+
         """
         self.class_dict: dict[str, tuple[InclusiveModelType, AdminClassType]] = {}
         self.app_labels = self._determine_app_labels(app_label, app_labels, auto_discover)
@@ -58,10 +65,12 @@ class AdminModelRegistrar:
         self.model_iterator()
         self.register_models()
 
-    def _determine_app_labels(self, app_label: Optional[str], app_labels: Optional[List[str]], auto_discover: bool) -> List[str]:
+    def _determine_app_labels(
+        self, app_label: str | None, app_labels: list[str] | None, auto_discover: bool
+    ) -> list[str]:
         """
         Determine which app labels to use based on the provided parameters and settings.
-        
+
         Priority order:
         1. Explicitly provided app_label or app_labels
         2. Settings configuration (APP_LABEL, APP_LABELS, AUTO_DISCOVER_ALL_APPS)
@@ -72,48 +81,47 @@ class AdminModelRegistrar:
             return [app_label]
         if app_labels:
             return app_labels
-        
+
         # Check settings
-        if hasattr(app_settings, 'APP_LABEL') and app_settings.APP_LABEL:
+        if hasattr(app_settings, "APP_LABEL") and app_settings.APP_LABEL:
             if isinstance(app_settings.APP_LABEL, list):
                 return app_settings.APP_LABEL
             return [app_settings.APP_LABEL]
-        
-        if hasattr(app_settings, 'APP_LABELS') and app_settings.APP_LABELS:
+
+        if hasattr(app_settings, "APP_LABELS") and app_settings.APP_LABELS:
             return app_settings.APP_LABELS
-        
+
         # Auto-discovery
-        if auto_discover or (hasattr(app_settings, 'AUTO_DISCOVER_ALL_APPS') and app_settings.AUTO_DISCOVER_ALL_APPS):
+        if auto_discover or (hasattr(app_settings, "AUTO_DISCOVER_ALL_APPS") and app_settings.AUTO_DISCOVER_ALL_APPS):
             return self._discover_app_labels()
-        
+
         # Default to empty list if nothing is configured
         return []
 
-    def _discover_app_labels(self) -> List[str]:
+    def _discover_app_labels(self) -> list[str]:
         """
         Discover all Django apps that have models.
-        
+
         Returns:
             List of app labels that have models.
+
         """
         discovered_apps = []
         for app_config in apps.get_app_configs():
             # Skip django_admin_magic itself and other Django system apps
-            if app_config.label in ['django_admin_magic', 'admin', 'auth', 'contenttypes', 'sessions']:
+            if app_config.label in ["django_admin_magic", "admin", "auth", "contenttypes", "sessions"]:
                 continue
-            
+
             # Check if the app has any models
             models = app_config.get_models()
             if models:
                 discovered_apps.append(app_config.label)
                 logger.info(f"Auto-discovered app: {app_config.label} with {len(models)} models")
-        
+
         return discovered_apps
 
     def _collect_models(self):
-        """
-        Collect all models from the specified app labels.
-        """
+        """Collect all models from the specified app labels."""
         for app_label in self.app_labels:
             try:
                 app_config = apps.get_app_config(app_label=app_label)
@@ -124,41 +132,44 @@ class AdminModelRegistrar:
                 logger.warning(f"App '{app_label}' not found in installed apps")
 
     @classmethod
-    def register_all_discovered_apps(cls) -> 'AdminModelRegistrar':
+    def register_all_discovered_apps(cls) -> "AdminModelRegistrar":
         """
         Class method to create a registrar that auto-discovers and registers all apps.
-        
+
         This is useful for users who want to register all their models automatically
         without specifying individual app labels.
-        
+
         Returns:
             AdminModelRegistrar instance configured for auto-discovery
+
         """
         return cls(auto_discover=True)
 
     @classmethod
-    def register_apps(cls, app_labels: List[str]) -> 'AdminModelRegistrar':
+    def register_apps(cls, app_labels: list[str]) -> "AdminModelRegistrar":
         """
         Class method to create a registrar for specific app labels.
-        
+
         Args:
             app_labels: List of app labels to register
-            
+
         Returns:
             AdminModelRegistrar instance configured for the specified apps
+
         """
         return cls(app_labels=app_labels)
 
     @classmethod
-    def register_app(cls, app_label: str) -> 'AdminModelRegistrar':
+    def register_app(cls, app_label: str) -> "AdminModelRegistrar":
         """
         Class method to create a registrar for a single app.
-        
+
         Args:
             app_label: The app label to register
-            
+
         Returns:
             AdminModelRegistrar instance configured for the specified app
+
         """
         return cls(app_label=app_label)
 
@@ -166,7 +177,7 @@ class AdminModelRegistrar:
         """
         Iterates through models and creates the associated admin class.
         Convenience method to create admin classes for models without
-        having to explicitly create them in each app's admin.py file
+        having to explicitly create them in each app's admin.py file.
         """
         for model in self.models:
             model_name = model.__name__ if isinstance(model, type) else model.__class__.__name__
@@ -176,7 +187,7 @@ class AdminModelRegistrar:
                 self.class_dict[str(model)] = (model, admin_class)
 
     def _admin_class_factory(self, model, admin_site):
-        """Creates class prototypes for admin_classes depending on the incoming model object"""
+        """Creates class prototypes for admin_classes depending on the incoming model object."""
         adminclass_name = f"AdminClass_{model.__name__}"
         common_class_kwargs = {"model": model, "admin_site": admin_site}
         return type(
@@ -199,6 +210,7 @@ class AdminModelRegistrar:
 
         Returns:
             A list with duplicates removed while preserving order
+
         """
         if isinstance(tuple_or_list, list):
             result = []
@@ -232,6 +244,7 @@ class AdminModelRegistrar:
 
         Raises:
             FieldDoesNotExist: If a field is not found on the model and doesn't match any valid pattern
+
         """
         # Cast model to appropriate type
         model_class = cast(
@@ -254,7 +267,7 @@ class AdminModelRegistrar:
             # Check if the field exists on the model OR the admin class
             if field not in model_fields and field not in model_attributes and field not in admin_class_attributes:
                 if isinstance(field, str):
-                    admin_class_name = getattr(admin_class, '__name__', f"AdminClass_{model_class.__name__}")
+                    admin_class_name = getattr(admin_class, "__name__", f"AdminClass_{model_class.__name__}")
                     msg = (
                         f"Field {field} not found in model {model_class.__name__} or admin class {admin_class_name}\n"
                         f"Model fields: {model_fields}\n"
@@ -265,8 +278,9 @@ class AdminModelRegistrar:
                     raise FieldDoesNotExist(
                         msg,
                     )
+                admin_class_name = getattr(admin_class, "__name__", f"AdminClass_{model_class.__name__}")
                 logger.debug(
-                    f"Field {field} not found in model {model_class.__name__} or admin class {getattr(admin_class, '__name__', f'AdminClass_{model_class.__name__}')}",
+                    f"Field {field} not found in model {model_class.__name__} or admin class {admin_class_name}",
                 )
 
     def _sync_admin_instance(self, model: InclusiveModelType) -> None:
@@ -286,6 +300,7 @@ class AdminModelRegistrar:
 
         Args:
             model: The model whose admin class needs to be synced
+
         """
         admin_class = self.return_admin_class_for_model(model)
         # Get the actual model class if we were passed an instance
@@ -444,6 +459,7 @@ class AdminModelRegistrar:
 
             # To disable all automatic JOINs
             registrar.update_list_select_related(MyModel, False)
+
         """
         admin_class = self.return_admin_class_for_model(model)
         admin_class.list_select_related = list_select_related
@@ -482,19 +498,20 @@ class AdminModelRegistrar:
                 short_description="Mark selected items as special",
                 is_action=True
             )
+
         """
         # Validate method_name
         if not method_name or not isinstance(method_name, str):
             raise ValueError("method_name must be a non-empty string")
-        
+
         # Validate method_func
         if method_func is None:
             raise ValueError("method_func cannot be None")
-        
+
         # Validate method_name format (should be a valid Python identifier)
-        if not method_name.replace('_', '').isalnum() or method_name[0].isdigit():
+        if not method_name.replace("_", "").isalnum() or method_name[0].isdigit():
             raise ValueError("method_name must be a valid Python identifier")
-        
+
         admin_instance = self.return_admin_class_for_model(model)  # This is the actual live instance
 
         final_wrapped_method: Callable
@@ -607,6 +624,7 @@ class AdminModelRegistrar:
         Args:
             model: The model to modify the admin display for
             list_display: Fields to add to the display list
+
         """
         admin_class = self.return_admin_class_for_model(model)
         if hasattr(admin_class, "list_display"):
@@ -638,6 +656,7 @@ class AdminModelRegistrar:
             model: The model to modify the admin display for
             list_display: Field(s) to add to the start of the display list.
                          Can be a single string or list/tuple of strings.
+
         """
         admin_class = self.return_admin_class_for_model(model)
         if hasattr(admin_class, "list_display"):
@@ -690,6 +709,7 @@ class AdminModelRegistrar:
         Raises:
             KeyError: If model not found in registered classes
             FieldDoesNotExist: If field doesn't exist on model
+
         """
         admin_class = self.return_admin_class_for_model(model)
         if hasattr(admin_class, "list_filter"):
@@ -727,6 +747,7 @@ class AdminModelRegistrar:
             admin_class.list_filter += ["is_custom_component", "category"]
             admin_class.show_full_result_count = False
             admin_class.paginator = TimeLimitedPaginator
+
         """
         model_class = cast("type[models.Model]", model if isinstance(model, type) else model.__class__)
         registered_instance = admin.site._registry.get(model_class)
@@ -753,6 +774,7 @@ class AdminModelRegistrar:
         Args:
             model: The model to add the inline to
             inline_class: The inline class to add
+
         """
         admin_class = self.return_admin_class_for_model(model)
 
@@ -766,13 +788,11 @@ class AdminModelRegistrar:
         if inline_class not in admin_class.inlines:
             admin_class.inlines.append(inline_class)
 
-        self._sync_admin_instance(model) 
+        self._sync_admin_instance(model)
 
 
 class PolymorphicAdminModelRegistrar(AdminModelRegistrar):
-    """
-    An extension of AdminModelRegistrar that handles polymorphic models.
-    """
+    """An extension of AdminModelRegistrar that handles polymorphic models."""
 
     def _admin_class_factory(self, model, admin_site):
         """
@@ -793,4 +813,4 @@ class PolymorphicAdminModelRegistrar(AdminModelRegistrar):
                 (PolymorphicChildListAdmin,),
                 common_class_kwargs,
             )
-        return super()._admin_class_factory(model, admin_site) 
+        return super()._admin_class_factory(model, admin_site)

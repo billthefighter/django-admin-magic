@@ -9,7 +9,13 @@ from django.http import HttpResponse
 from polymorphic.admin import PolymorphicChildModelAdmin, PolymorphicParentModelAdmin
 
 from .conf import app_settings
-from .utils import get_all_child_classes, linkify, linkify_gfk, TimeLimitedPaginator, reorder_list_display_to_avoid_linkify_first
+from .utils import (
+    TimeLimitedPaginator,
+    get_all_child_classes,
+    linkify,
+    linkify_gfk,
+    reorder_list_display_to_avoid_linkify_first,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +46,7 @@ class ListAdminMixin:
 
         Args:
             model: The model this admin class is for
+
         """
         # After registration, admin classes are instantiated with tuples in these attributes. We want to modify those,
         # So we need to recast the fields we want to modify as lists.
@@ -108,6 +115,7 @@ class ListAdminMixin:
 
         Args:
             fields_at_end_of_list: Optional list of fields to append at the end of list_display
+
         """
         fields_at_end_of_list = fields_at_end_of_list or []
         modelfields = self.model._meta.fields
@@ -144,7 +152,7 @@ class ListAdminMixin:
                 # Add boolean fields and foreign keys to list_filter by default
                 if isinstance(
                     field,
-                    (models.BooleanField, models.DateTimeField, models.CharField),
+                    models.BooleanField | models.DateTimeField | models.CharField,
                 ):
                     self.list_filter.append(field.name)
 
@@ -165,23 +173,21 @@ class ListAdminMixin:
             self.list_display = reorder_list_display_to_avoid_linkify_first(self.list_display)
 
         # Ensure export_as_csv action is available
-        if not hasattr(self, 'actions'):
+        if not hasattr(self, "actions"):
             self.actions = []
         if not isinstance(self.actions, list):
             self.actions = list(self.actions)
-        
+
         # Add export_as_csv action if it's not already there
-        if hasattr(self, 'export_as_csv') and 'export_as_csv' not in self.actions:
-            self.actions.append('export_as_csv')
+        if hasattr(self, "export_as_csv") and "export_as_csv" not in self.actions:
+            self.actions.append("export_as_csv")
 
         logger.debug(f"after set_changelist_fields, List display is {self.list_display}")
         logger.debug(f"list_filter is {self.list_filter}")
 
 
 class AdminDefaultsMixin:
-    """
-    Sensible defaults for database queries in admin classes.
-    """
+    """Sensible defaults for database queries in admin classes."""
 
     def __init__(self, model):
         # logger.info(f"Initializing AdminDefaultsMixin for {model.__name__}")
@@ -214,4 +220,4 @@ class PolymorphicChildListAdmin(PolymorphicChildModelAdmin, ListAdminMixin, Admi
     def __init__(self, model, admin_site):
         super().__init__(model=model, admin_site=admin_site)
         ListAdminMixin.__init__(self, model)
-        AdminDefaultsMixin.__init__(self, model) 
+        AdminDefaultsMixin.__init__(self, model)

@@ -1,43 +1,30 @@
-from django.db import migrations
-from django.contrib.contenttypes.models import ContentType
-from datetime import timedelta
 import uuid
+from datetime import timedelta
+
+from django.db import migrations
 
 
 def create_sample_data(apps, schema_editor):
     """Create sample data for all models."""
-    
     # Get model classes
-    SimpleModel = apps.get_model('demo_app', 'SimpleModel')
-    ComplexModel = apps.get_model('demo_app', 'ComplexModel')
-    ForeignKeyModel = apps.get_model('demo_app', 'ForeignKeyModel')
-    PolymorphicParent = apps.get_model('demo_app', 'PolymorphicParent')
-    PolymorphicChildA = apps.get_model('demo_app', 'PolymorphicChildA')
-    PolymorphicChildB = apps.get_model('demo_app', 'PolymorphicChildB')
-    ModelWithProperties = apps.get_model('demo_app', 'ModelWithProperties')
-    ModelWithSearchVector = apps.get_model('demo_app', 'ModelWithSearchVector')
-    ModelWithCustomManager = apps.get_model('demo_app', 'ModelWithCustomManager')
-    
+    SimpleModel = apps.get_model("demo_app", "SimpleModel")
+    ComplexModel = apps.get_model("demo_app", "ComplexModel")
+    ForeignKeyModel = apps.get_model("demo_app", "ForeignKeyModel")
+    PolymorphicParent = apps.get_model("demo_app", "PolymorphicParent")
+    PolymorphicChildA = apps.get_model("demo_app", "PolymorphicChildA")
+    PolymorphicChildB = apps.get_model("demo_app", "PolymorphicChildB")
+    ModelWithProperties = apps.get_model("demo_app", "ModelWithProperties")
+    ModelWithSearchVector = apps.get_model("demo_app", "ModelWithSearchVector")
+    ModelWithCustomManager = apps.get_model("demo_app", "ModelWithCustomManager")
+
     # Create SimpleModel instances
-    simple1 = SimpleModel.objects.create(
-        name="Sample Item 1",
-        is_active=True
-    )
-    simple2 = SimpleModel.objects.create(
-        name="Sample Item 2",
-        is_active=False
-    )
-    simple3 = SimpleModel.objects.create(
-        name="Sample Item 3",
-        is_active=True
-    )
-    
+    simple1 = SimpleModel.objects.create(name="Sample Item 1", is_active=True)
+    simple2 = SimpleModel.objects.create(name="Sample Item 2", is_active=False)
+    simple3 = SimpleModel.objects.create(name="Sample Item 3", is_active=True)
+
     # Create one-to-one SimpleModel first
-    one_to_one_simple = SimpleModel.objects.create(
-        name="One-to-One Sample",
-        is_active=True
-    )
-    
+    one_to_one_simple = SimpleModel.objects.create(name="One-to-One Sample", is_active=True)
+
     # Create ComplexModel instances
     complex1 = ComplexModel.objects.create(
         char_field="Complex Sample 1",
@@ -56,17 +43,17 @@ def create_sample_data(apps, schema_editor):
         email_field="sample1@example.com",
         json_field={"key": "value", "nested": {"data": "test"}},
         uuid_field=uuid.uuid4(),
-        binary_field=b'sample_binary_data',
+        binary_field=b"sample_binary_data",
         slug_field="complex-sample-1",
         ip_address_field="192.168.1.100",
         ipv4_field="10.0.0.1",
         ipv6_field="2001:db8::1",
-        choices_field='A',
+        choices_field="A",
         nullable_char="Optional text",
         nullable_int=42,
-        nullable_date=None
+        nullable_date=None,
     )
-    
+
     complex2 = ComplexModel.objects.create(
         char_field="Complex Sample 2",
         text_field="Another complex model instance",
@@ -84,17 +71,17 @@ def create_sample_data(apps, schema_editor):
         email_field="sample2@example.com",
         json_field={"status": "active", "tags": ["demo", "test"]},
         uuid_field=uuid.uuid4(),
-        binary_field=b'another_binary_data',
+        binary_field=b"another_binary_data",
         slug_field="complex-sample-2",
         ip_address_field="172.16.0.1",
         ipv4_field="192.168.0.1",
         ipv6_field="::ffff:192.168.0.1",
-        choices_field='B',
+        choices_field="B",
         nullable_char=None,
         nullable_int=None,
-        nullable_date=None
+        nullable_date=None,
     )
-    
+
     # Create ForeignKeyModel instances with one_to_one field
     fk1 = ForeignKeyModel.objects.create(
         simple_foreign_key=simple1,
@@ -103,9 +90,9 @@ def create_sample_data(apps, schema_editor):
         one_to_one=one_to_one_simple,
         name="FK Model 1",
         description="First foreign key model",
-        is_active=True
+        is_active=True,
     )
-    
+
     fk2 = ForeignKeyModel.objects.create(
         simple_foreign_key=simple3,
         nullable_foreign_key=None,
@@ -113,126 +100,79 @@ def create_sample_data(apps, schema_editor):
         one_to_one=simple1,  # Use simple1 for the second FK model
         name="FK Model 2",
         description="Second foreign key model",
-        is_active=False
+        is_active=False,
     )
-    
+
     # Add many-to-many relationships
     fk1.many_to_many.add(simple1, simple2)
     fk2.many_to_many.add(simple3)
-    
+
     # Create self-referencing relationships
     fk1.parent = None  # Root level
-    fk2.parent = fk1   # Child of fk1
+    fk2.parent = fk1  # Child of fk1
     fk1.save()
     fk2.save()
-    
+
     # Create Polymorphic models
-    poly_parent1 = PolymorphicParent.objects.create(
-        name="Polymorphic Parent 1"
-    )
-    
-    poly_child_a1 = PolymorphicChildA.objects.create(
-        name="Child A 1",
-        field_a="Special field A1",
-        is_special=True
-    )
-    
-    poly_child_a2 = PolymorphicChildA.objects.create(
-        name="Child A 2",
-        field_a="Regular field A2",
-        is_special=False
-    )
-    
-    poly_child_b1 = PolymorphicChildB.objects.create(
-        name="Child B 1",
-        field_b=42,
-        category="premium"
-    )
-    
-    poly_child_b2 = PolymorphicChildB.objects.create(
-        name="Child B 2",
-        field_b=100,
-        category="standard"
-    )
-    
+    PolymorphicParent.objects.create(name="Polymorphic Parent 1")
+
+    PolymorphicChildA.objects.create(name="Child A 1", field_a="Special field A1", is_special=True)
+
+    PolymorphicChildA.objects.create(name="Child A 2", field_a="Regular field A2", is_special=False)
+
+    PolymorphicChildB.objects.create(name="Child B 1", field_b=42, category="premium")
+
+    PolymorphicChildB.objects.create(name="Child B 2", field_b=100, category="standard")
+
     # Create ModelWithProperties instances
-    prop1 = ModelWithProperties.objects.create(
-        first_name="John",
-        last_name="Doe",
-        age=25,
-        is_active=True
-    )
-    
-    prop2 = ModelWithProperties.objects.create(
-        first_name="Jane",
-        last_name="Smith",
-        age=16,
-        is_active=True
-    )
-    
-    prop3 = ModelWithProperties.objects.create(
-        first_name="Bob",
-        last_name="Johnson",
-        age=30,
-        is_active=False
-    )
-    
+    ModelWithProperties.objects.create(first_name="John", last_name="Doe", age=25, is_active=True)
+
+    ModelWithProperties.objects.create(first_name="Jane", last_name="Smith", age=16, is_active=True)
+
+    ModelWithProperties.objects.create(first_name="Bob", last_name="Johnson", age=30, is_active=False)
+
     # Create ModelWithSearchVector instances
-    search1 = ModelWithSearchVector.objects.create(
+    ModelWithSearchVector.objects.create(
         title="Introduction to Django",
-        content="Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design.",
-        is_published=True
+        content=(
+            "Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design."
+        ),
+        is_published=True,
     )
-    
-    search2 = ModelWithSearchVector.objects.create(
+
+    ModelWithSearchVector.objects.create(
         title="Advanced Django Patterns",
         content="Learn about advanced patterns and best practices for Django development.",
-        is_published=False
+        is_published=False,
     )
-    
-    search3 = ModelWithSearchVector.objects.create(
+
+    ModelWithSearchVector.objects.create(
         title="Django Admin Customization",
         content="How to customize the Django admin interface for better user experience.",
-        is_published=True
+        is_published=True,
     )
-    
+
     # Create ModelWithCustomManager instances
-    custom1 = ModelWithCustomManager.objects.create(
-        name="Featured Item 1",
-        category="Technology",
-        is_featured=True
-    )
-    
-    custom2 = ModelWithCustomManager.objects.create(
-        name="Regular Item 1",
-        category="Technology",
-        is_featured=False
-    )
-    
-    custom3 = ModelWithCustomManager.objects.create(
-        name="Featured Item 2",
-        category="Design",
-        is_featured=True
-    )
-    
-    custom4 = ModelWithCustomManager.objects.create(
-        name="Regular Item 2",
-        category="Design",
-        is_featured=False
-    )
+    ModelWithCustomManager.objects.create(name="Featured Item 1", category="Technology", is_featured=True)
+
+    ModelWithCustomManager.objects.create(name="Regular Item 1", category="Technology", is_featured=False)
+
+    ModelWithCustomManager.objects.create(name="Featured Item 2", category="Design", is_featured=True)
+
+    ModelWithCustomManager.objects.create(name="Regular Item 2", category="Design", is_featured=False)
 
 
 def remove_sample_data(apps, schema_editor):
     """Remove sample data."""
     # Get model classes
-    SimpleModel = apps.get_model('demo_app', 'SimpleModel')
-    ComplexModel = apps.get_model('demo_app', 'ComplexModel')
-    ForeignKeyModel = apps.get_model('demo_app', 'ForeignKeyModel')
-    PolymorphicParent = apps.get_model('demo_app', 'PolymorphicParent')
-    ModelWithProperties = apps.get_model('demo_app', 'ModelWithProperties')
-    ModelWithSearchVector = apps.get_model('demo_app', 'ModelWithSearchVector')
-    ModelWithCustomManager = apps.get_model('demo_app', 'ModelWithCustomManager')
-    
+    SimpleModel = apps.get_model("demo_app", "SimpleModel")
+    ComplexModel = apps.get_model("demo_app", "ComplexModel")
+    ForeignKeyModel = apps.get_model("demo_app", "ForeignKeyModel")
+    PolymorphicParent = apps.get_model("demo_app", "PolymorphicParent")
+    ModelWithProperties = apps.get_model("demo_app", "ModelWithProperties")
+    ModelWithSearchVector = apps.get_model("demo_app", "ModelWithSearchVector")
+    ModelWithCustomManager = apps.get_model("demo_app", "ModelWithCustomManager")
+
     # Delete all instances
     ModelWithCustomManager.objects.all().delete()
     ModelWithSearchVector.objects.all().delete()
@@ -245,9 +185,9 @@ def remove_sample_data(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('demo_app', '0001_initial'),
+        ("demo_app", "0001_initial"),
     ]
 
     operations = [
         migrations.RunPython(create_sample_data, remove_sample_data),
-    ] 
+    ]

@@ -1,22 +1,16 @@
 import pytest
 from django.contrib import admin
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.test import override_settings
 
 from django_admin_magic.registrar import AdminModelRegistrar
+
 from .models import (
     ComplexModel,
     ForeignKeyModel,
-    GenericForeignKeyModel,
-    ModelWithCustomManager,
-    ModelWithProperties,
-    ModelWithSearchVector,
-    PolymorphicChildA,
-    PolymorphicChildB,
-    PolymorphicParent,
     SimpleModel,
 )
 
@@ -27,92 +21,99 @@ class TestEdgeCaseModels:
 
     def test_model_with_no_fields(self):
         """Test handling of a model with no fields (except id)."""
+
         class EmptyModel(models.Model):
             class Meta:
                 app_label = "tests"
-        
+
         # This should not crash the registrar
-        registrar = AdminModelRegistrar("tests")
-        
+        AdminModelRegistrar("tests")
+
         # The model should be registered
         assert admin.site.is_registered(EmptyModel)
 
     def test_model_with_only_auto_fields(self):
         """Test handling of a model with only auto-generated fields."""
+
         class AutoFieldModel(models.Model):
             created_at = models.DateTimeField(auto_now_add=True)
             updated_at = models.DateTimeField(auto_now=True)
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(AutoFieldModel)
 
     def test_model_with_only_foreign_keys(self):
         """Test handling of a model with only foreign key fields."""
+
         class ForeignKeyOnlyModel(models.Model):
             simple_fk = models.ForeignKey(SimpleModel, on_delete=models.CASCADE)
             complex_fk = models.ForeignKey(ComplexModel, on_delete=models.CASCADE)
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(ForeignKeyOnlyModel)
 
     def test_model_with_only_properties(self):
         """Test handling of a model with only properties."""
+
         class PropertyOnlyModel(models.Model):
             @property
             def computed_field(self):
                 return "computed"
-            
+
             @property
             def another_property(self):
                 return "another"
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(PropertyOnlyModel)
 
     def test_model_with_very_long_field_names(self):
         """Test handling of models with very long field names."""
+
         class LongFieldNameModel(models.Model):
             very_long_field_name_that_exceeds_normal_length_limits = models.CharField(max_length=100)
             another_very_long_field_name_that_exceeds_normal_length_limits = models.TextField()
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(LongFieldNameModel)
 
     def test_model_with_special_characters_in_field_names(self):
         """Test handling of models with special characters in field names."""
+
         class SpecialCharModel(models.Model):
             field_with_underscores = models.CharField(max_length=100)
             field_with_dashes = models.CharField(max_length=100)
             field_with_dots = models.CharField(max_length=100)
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(SpecialCharModel)
 
     def test_model_with_unicode_field_names(self):
         """Test handling of models with unicode field names."""
+
         class UnicodeFieldModel(models.Model):
             unicode_field_测试 = models.CharField(max_length=100)
             another_unicode_field_测试 = models.TextField()
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(UnicodeFieldModel)
 
 
@@ -122,6 +123,7 @@ class TestEdgeCaseFieldTypes:
 
     def test_model_with_all_field_types(self):
         """Test handling of a model with all possible Django field types."""
+
         class AllFieldTypesModel(models.Model):
             # Basic fields
             char_field = models.CharField(max_length=100)
@@ -135,74 +137,76 @@ class TestEdgeCaseFieldTypes:
             float_field = models.FloatField()
             boolean_field = models.BooleanField()
             null_boolean_field = models.BooleanField(null=True)
-            
+
             # Date and time fields
             date_field = models.DateField()
             time_field = models.TimeField()
             datetime_field = models.DateTimeField()
             duration_field = models.DurationField()
-            
+
             # File fields
-            file_field = models.FileField(upload_to='test/')
-            image_field = models.ImageField(upload_to='test/')
-            
+            file_field = models.FileField(upload_to="test/")
+            image_field = models.ImageField(upload_to="test/")
+
             # URL and email fields
             url_field = models.URLField()
             email_field = models.EmailField()
-            
+
             # JSON field
             json_field = models.JSONField()
-            
+
             # UUID field
             uuid_field = models.UUIDField()
-            
+
             # Binary field
             binary_field = models.BinaryField()
-            
+
             # Slug field
             slug_field = models.SlugField()
-            
+
             # IP address fields
             ip_address_field = models.GenericIPAddressField()
-            ipv4_field = models.GenericIPAddressField(protocol='IPv4')
-            ipv6_field = models.GenericIPAddressField(protocol='IPv6')
-            
+            ipv4_field = models.GenericIPAddressField(protocol="IPv4")
+            ipv6_field = models.GenericIPAddressField(protocol="IPv6")
+
             # File path field
-            file_path_field = models.FilePathField(path='/tmp')
-            
+            file_path_field = models.FilePathField(path="/tmp")
+
             # Choices field
-            choices_field = models.CharField(max_length=1, choices=[('A', 'A'), ('B', 'B')])
-            
+            choices_field = models.CharField(max_length=1, choices=[("A", "A"), ("B", "B")])
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(AllFieldTypesModel)
 
     def test_model_with_custom_field(self):
         """Test handling of models with custom fields."""
+
         class CustomField(models.CharField):
             def __init__(self, *args, **kwargs):
-                kwargs['max_length'] = 100
+                kwargs["max_length"] = 100
                 super().__init__(*args, **kwargs)
-        
+
         class CustomFieldModel(models.Model):
             custom_field = CustomField()
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(CustomFieldModel)
 
     def test_model_with_proxy_fields(self):
         """Test handling of models with proxy fields."""
+
         class ProxyFieldModel(SimpleModel):
             class Meta:
                 proxy = True
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(ProxyFieldModel)
 
 
@@ -212,84 +216,88 @@ class TestEdgeCaseRelationships:
 
     def test_model_with_self_referencing_foreign_key(self):
         """Test handling of models with self-referencing foreign keys."""
+
         class SelfReferencingModel(models.Model):
             name = models.CharField(max_length=100)
-            parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
-            
+            parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(SelfReferencingModel)
 
     def test_model_with_multiple_generic_foreign_keys(self):
         """Test handling of models with multiple generic foreign keys."""
+
         class MultipleGFKModel(models.Model):
-            content_type1 = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='gfk1')
+            content_type1 = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="gfk1")
             object_id1 = models.PositiveIntegerField()
-            content_object1 = GenericForeignKey('content_type1', 'object_id1')
-            
-            content_type2 = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='gfk2')
+            content_object1 = GenericForeignKey("content_type1", "object_id1")
+
+            content_type2 = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="gfk2")
             object_id2 = models.PositiveIntegerField()
-            content_object2 = GenericForeignKey('content_type2', 'object_id2')
-            
-            content_type3 = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='gfk3')
+            content_object2 = GenericForeignKey("content_type2", "object_id2")
+
+            content_type3 = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="gfk3")
             object_id3 = models.PositiveIntegerField()
-            content_object3 = GenericForeignKey('content_type3', 'object_id3')
-            
+            content_object3 = GenericForeignKey("content_type3", "object_id3")
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(MultipleGFKModel)
 
     def test_model_with_circular_foreign_keys(self):
         """Test handling of models with circular foreign key relationships."""
+
         class CircularModelA(models.Model):
             name = models.CharField(max_length=100)
-            model_b = models.ForeignKey('CircularModelB', on_delete=models.CASCADE, null=True, blank=True)
-            
+            model_b = models.ForeignKey("CircularModelB", on_delete=models.CASCADE, null=True, blank=True)
+
             class Meta:
                 app_label = "tests"
-        
+
         class CircularModelB(models.Model):
             name = models.CharField(max_length=100)
             model_a = models.ForeignKey(CircularModelA, on_delete=models.CASCADE, null=True, blank=True)
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(CircularModelA)
         assert admin.site.is_registered(CircularModelB)
 
     def test_model_with_deep_inheritance(self):
         """Test handling of models with deep inheritance."""
+
         class DeepBaseModel(models.Model):
             base_field = models.CharField(max_length=100)
-            
+
             class Meta:
                 app_label = "tests"
-        
+
         class DeepLevel1Model(DeepBaseModel):
             level1_field = models.CharField(max_length=100)
-            
+
             class Meta:
                 app_label = "tests"
-        
+
         class DeepLevel2Model(DeepLevel1Model):
             level2_field = models.CharField(max_length=100)
-            
+
             class Meta:
                 app_label = "tests"
-        
+
         class DeepLevel3Model(DeepLevel2Model):
             level3_field = models.CharField(max_length=100)
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         assert admin.site.is_registered(DeepBaseModel)
         assert admin.site.is_registered(DeepLevel1Model)
         assert admin.site.is_registered(DeepLevel2Model)
@@ -315,39 +323,42 @@ class TestEdgeCaseRegistrar:
 
     def test_registrar_with_abstract_models_only(self):
         """Test registrar behavior with an app that has only abstract models."""
+
         class AbstractModel(models.Model):
             name = models.CharField(max_length=100)
-            
+
             class Meta:
                 abstract = True
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         # Abstract models should not be registered
         assert not admin.site.is_registered(AbstractModel)
 
     def test_registrar_with_models_excluded_by_filter(self):
         """Test registrar behavior with models that should be excluded by filter."""
+
         class HistoricalModel(models.Model):
             name = models.CharField(max_length=100)
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         # Historical models should be excluded by default filter
         assert not admin.site.is_registered(HistoricalModel)
 
     @override_settings(AUTO_ADMIN_DEFAULT_DO_NOT_REGISTER_FILTER_STRING_LIST=["Test"])
     def test_registrar_with_custom_exclusion_filter(self):
         """Test registrar behavior with custom exclusion filters."""
+
         class TestModel(models.Model):
             name = models.CharField(max_length=100)
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
+
+        AdminModelRegistrar("tests")
         # TestModel should be excluded by custom filter
         assert not admin.site.is_registered(TestModel)
 
@@ -358,36 +369,26 @@ class TestEdgeCaseAdminMethods:
 
     def test_add_admin_method_with_nonexistent_model(self, registrar):
         """Test adding admin method to a nonexistent model."""
+
         def custom_method(obj):
             return "custom"
-        
+
         with pytest.raises(KeyError):
-            registrar.add_admin_method(
-                "NonexistentModel",
-                "custom_method",
-                custom_method
-            )
+            registrar.add_admin_method("NonexistentModel", "custom_method", custom_method)
 
     def test_add_admin_method_with_invalid_method_name(self, registrar):
         """Test adding admin method with invalid method name."""
+
         def custom_method(obj):
             return "custom"
-        
+
         with pytest.raises(ValueError):
-            registrar.add_admin_method(
-                SimpleModel,
-                "invalid-method-name",
-                custom_method
-            )
+            registrar.add_admin_method(SimpleModel, "invalid-method-name", custom_method)
 
     def test_add_admin_method_with_none_method(self, registrar):
         """Test adding admin method with None method."""
         with pytest.raises(ValueError):
-            registrar.add_admin_method(
-                SimpleModel,
-                "custom_method",
-                None
-            )
+            registrar.add_admin_method(SimpleModel, "custom_method", None)
 
     def test_append_list_display_with_nonexistent_model(self, registrar):
         """Test appending to list_display for nonexistent model."""
@@ -421,11 +422,11 @@ class TestEdgeCaseData:
 
     def test_admin_with_empty_queryset(self, admin_site):
         """Test admin behavior with empty queryset."""
-        admin_class = admin_site._registry[SimpleModel]
-        
+        admin_site._registry[SimpleModel]
+
         # Create an empty queryset
         queryset = SimpleModel.objects.none()
-        
+
         # Should not crash
         assert queryset.count() == 0
 
@@ -434,36 +435,30 @@ class TestEdgeCaseData:
         # Create many instances
         for i in range(100):
             SimpleModel.objects.create(name=f"Test {i}", is_active=True)
-        
-        admin_class = admin_site._registry[SimpleModel]
+
+        admin_site._registry[SimpleModel]
         queryset = SimpleModel.objects.all()
-        
+
         # Should handle large querysets
         assert queryset.count() == 100
 
     def test_admin_with_unicode_data(self, admin_site):
         """Test admin behavior with unicode data."""
         # Create instance with unicode data
-        instance = SimpleModel.objects.create(
-            name="测试模型",
-            is_active=True
-        )
-        
-        admin_class = admin_site._registry[SimpleModel]
-        
+        instance = SimpleModel.objects.create(name="测试模型", is_active=True)
+
+        admin_site._registry[SimpleModel]
+
         # Should handle unicode data
         assert instance.name == "测试模型"
 
     def test_admin_with_special_characters_in_data(self, admin_site):
         """Test admin behavior with special characters in data."""
         # Create instance with special characters
-        instance = SimpleModel.objects.create(
-            name="Test & Model <script>alert('xss')</script>",
-            is_active=True
-        )
-        
-        admin_class = admin_site._registry[SimpleModel]
-        
+        instance = SimpleModel.objects.create(name="Test & Model <script>alert('xss')</script>", is_active=True)
+
+        admin_site._registry[SimpleModel]
+
         # Should handle special characters
         assert "&" in instance.name
         assert "<script>" in instance.name
@@ -478,10 +473,10 @@ class TestEdgeCasePerformance:
         # Create many instances to simulate slow query
         for i in range(1000):
             SimpleModel.objects.create(name=f"Test {i}", is_active=True)
-        
-        admin_class = admin_site._registry[SimpleModel]
+
+        admin_site._registry[SimpleModel]
         queryset = SimpleModel.objects.all()
-        
+
         # Should handle large querysets without timeout
         assert queryset.count() == 1000
 
@@ -491,20 +486,14 @@ class TestEdgeCasePerformance:
         simple = SimpleModel.objects.create(name="Test", is_active=True)
         complex_model = ComplexModel.objects.create(char_field="Test")
         one_to_one_simple = SimpleModel.objects.create(name="One-to-One Test", is_active=True)
-        
-        fk_model = ForeignKeyModel.objects.create(
-            simple_foreign_key=simple,
-            complex_foreign_key=complex_model,
-            one_to_one=one_to_one_simple,
-            name="Test FK"
+
+        ForeignKeyModel.objects.create(
+            simple_foreign_key=simple, complex_foreign_key=complex_model, one_to_one=one_to_one_simple, name="Test FK"
         )
-        
-        admin_class = admin_site._registry[ForeignKeyModel]
-        queryset = ForeignKeyModel.objects.select_related(
-            'simple_foreign_key',
-            'complex_foreign_key'
-        )
-        
+
+        admin_site._registry[ForeignKeyModel]
+        queryset = ForeignKeyModel.objects.select_related("simple_foreign_key", "complex_foreign_key")
+
         # Should handle complex querysets
         assert queryset.count() == 1
 
@@ -514,20 +503,16 @@ class TestEdgeCasePerformance:
         simple = SimpleModel.objects.create(name="Test", is_active=True)
         complex_model = ComplexModel.objects.create(char_field="Test")
         one_to_one_simple = SimpleModel.objects.create(name="One-to-One Test", is_active=True)
-        
-        fk_model = ForeignKeyModel.objects.create(
-            simple_foreign_key=simple,
-            complex_foreign_key=complex_model,
-            one_to_one=one_to_one_simple,
-            name="Test FK"
+
+        ForeignKeyModel.objects.create(
+            simple_foreign_key=simple, complex_foreign_key=complex_model, one_to_one=one_to_one_simple, name="Test FK"
         )
-        
-        admin_class = admin_site._registry[ForeignKeyModel]
-        queryset = ForeignKeyModel.objects.select_related(
-            'simple_foreign_key',
-            'complex_foreign_key'
-        ).prefetch_related('many_to_many')
-        
+
+        admin_site._registry[ForeignKeyModel]
+        queryset = ForeignKeyModel.objects.select_related("simple_foreign_key", "complex_foreign_key").prefetch_related(
+            "many_to_many"
+        )
+
         # Should handle nested querysets
         assert queryset.count() == 1
 
@@ -538,45 +523,44 @@ class TestEdgeCaseErrorHandling:
 
     def test_admin_with_broken_model_method(self, admin_site):
         """Test admin behavior when model method raises exception."""
+
         class BrokenModel(SimpleModel):
             @property
             def broken_property(self):
                 raise Exception("Broken property")
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
-        
+
+        AdminModelRegistrar("tests")
+
         # Should handle broken methods gracefully
         assert admin.site.is_registered(BrokenModel)
 
     def test_admin_with_broken_admin_method(self, registrar, admin_site):
         """Test admin behavior when admin method raises exception."""
+
         def broken_method(obj):
             raise Exception("Broken method")
-        
-        registrar.add_admin_method(
-            SimpleModel,
-            "broken_method",
-            broken_method
-        )
-        
+
+        registrar.add_admin_method(SimpleModel, "broken_method", broken_method)
+
         admin_class = admin_site._registry[SimpleModel]
-        
+
         # Should handle broken admin methods gracefully
         assert hasattr(admin_class, "broken_method")
 
     def test_admin_with_broken_linkify(self, admin_site):
         """Test admin behavior when linkify function raises exception."""
+
         class BrokenLinkifyModel(models.Model):
             broken_fk = models.ForeignKey(SimpleModel, on_delete=models.CASCADE)
-            
+
             class Meta:
                 app_label = "tests"
-        
-        registrar = AdminModelRegistrar("tests")
-        
+
+        AdminModelRegistrar("tests")
+
         # Should handle broken linkify gracefully
         assert admin.site.is_registered(BrokenLinkifyModel)
 
@@ -589,12 +573,12 @@ class TestEdgeCaseErrorHandling:
             simple_foreign_key=simple,
             complex_foreign_key=ComplexModel.objects.create(char_field="Test"),
             one_to_one=one_to_one_simple,
-            name="Test FK"
+            name="Test FK",
         )
-        
+
         # Test that the admin can handle the relationship
         admin_class = admin_site._registry[ForeignKeyModel]
-        assert hasattr(admin_class, 'list_display')
-        
+        assert hasattr(admin_class, "list_display")
+
         # Should handle missing related objects gracefully
-        assert fk_model.simple_foreign_key_id is not None 
+        assert fk_model.simple_foreign_key_id is not None

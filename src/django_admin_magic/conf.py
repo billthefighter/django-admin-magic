@@ -4,9 +4,7 @@ from . import defaults
 
 
 class AppSettings:
-    """
-    A settings object that allows overriding default settings from the Django project's settings.
-    """
+    """A settings object that allows overriding default settings from the Django project's settings."""
 
     def __init__(self, prefix="AUTO_ADMIN_"):
         self.prefix = prefix
@@ -25,4 +23,4 @@ class AppSettings:
         raise AttributeError(f"'AppSettings' object has no attribute '{name}'")
 
 
-app_settings = AppSettings() 
+app_settings = AppSettings()

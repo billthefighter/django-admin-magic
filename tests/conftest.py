@@ -1,10 +1,11 @@
 import os
+
 import django
 from django.conf import settings
 
 # Configure Django settings before importing any Django modules
 if not settings.configured:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.test_settings')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.test_settings")
     django.setup()
 
 import pytest
@@ -16,7 +17,6 @@ from .models import (
     ComplexModel,
     ForeignKeyModel,
     GenericForeignKeyModel,
-    ModelWithAddedField,
     ModelWithCustomManager,
     ModelWithProperties,
     ModelWithSearchVector,
@@ -78,7 +78,7 @@ def foreign_key_model_instance(simple_model_instance, complex_model_instance):
         name="One-to-One Model",
         is_active=True,
     )
-    
+
     fk_model = ForeignKeyModel.objects.create(
         simple_foreign_key=simple_model_instance,
         complex_foreign_key=complex_model_instance,
@@ -87,10 +87,10 @@ def foreign_key_model_instance(simple_model_instance, complex_model_instance):
         description="Testing foreign key relationships",
         is_active=True,
     )
-    
+
     # Add many-to-many relationship
     fk_model.many_to_many.add(simple_model_instance)
-    
+
     return fk_model
 
 
@@ -106,7 +106,7 @@ def generic_foreign_key_model_instance(simple_model_instance, complex_model_inst
         name="Test GFK Model",
         description="Testing generic foreign key",
     )
-    
+
     return gfk_model
 
 
@@ -178,4 +178,5 @@ def admin_site():
 def registrar():
     """Provide access to the AdminModelRegistrar instance."""
     from django.apps import apps
-    return apps.get_app_config("django_admin_magic").registrar 
+
+    return apps.get_app_config("django_admin_magic").registrar
