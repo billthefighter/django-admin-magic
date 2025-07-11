@@ -1,9 +1,9 @@
 [build-system]
-requires = ["hatchling", "setuptools-scm"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/django_admin_magic"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [project]
 name = "django-admin-magic"

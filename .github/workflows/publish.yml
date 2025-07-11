@@ -26,8 +26,4 @@ jobs:
         run: python -m build
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          # No password needed with trusted publishing
-          # The workflow will use the trusted publisher configuration
-          # Make sure you've set up trusted publishing in your PyPI project settings 
+        uses: pypa/gh-action-pypi-publish@release/v1 
