@@ -7,7 +7,7 @@ from django.db import models
 from django.test import RequestFactory
 from django.urls import reverse
 
-from django_auto_admin.utils import (
+from django_admin_magic.utils import (
     TimeLimitedPaginator,
     get_all_child_classes,
     is_polymorphic_model,
@@ -60,7 +60,7 @@ class TestLinkify:
     def test_linkify_with_valid_foreign_key(self, foreign_key_model_instance):
         """Test that linkify creates a proper link for a foreign key."""
         # Ensure SimpleModel is registered in admin for the linkify function to work
-        from django_auto_admin.registrar import AdminModelRegistrar
+        from django_admin_magic.registrar import AdminModelRegistrar
         registrar = AdminModelRegistrar(app_label="tests")
         
         # Debug: Check if SimpleModel is registered
@@ -96,7 +96,7 @@ class TestLinkify:
     def test_linkify_with_invalid_url(self, foreign_key_model_instance):
         """Test that linkify handles invalid URLs gracefully."""
         # Ensure SimpleModel is registered in admin for the linkify function to work
-        from django_auto_admin.registrar import AdminModelRegistrar
+        from django_admin_magic.registrar import AdminModelRegistrar
         registrar = AdminModelRegistrar(app_label="tests")
         
         # Test with a field that doesn't have an admin URL

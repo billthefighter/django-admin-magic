@@ -135,7 +135,7 @@ def setup_database_environment(database):
     """Set up environment variables for a specific database."""
     if database == 'postgresql':
         env_vars = {
-            'POSTGRES_DB': 'django_auto_admin_test',
+            'POSTGRES_DB': 'django_admin_magic_test',
             'POSTGRES_USER': 'postgres',
             'POSTGRES_PASSWORD': 'postgres',
             'POSTGRES_HOST': 'localhost',
@@ -143,7 +143,7 @@ def setup_database_environment(database):
         }
     elif database == 'mysql':
         env_vars = {
-            'MYSQL_DB': 'django_auto_admin_test',
+            'MYSQL_DB': 'django_admin_magic_test',
             'MYSQL_USER': 'root',
             'MYSQL_PASSWORD': '',
             'MYSQL_HOST': 'localhost',
@@ -250,7 +250,7 @@ Examples:
     if args.verbose:
         options.append("-v")
     if args.coverage:
-        options.extend(["--cov=django_auto_admin", "--cov-report=term-missing"])
+        options.extend(["--cov=django_admin_magic", "--cov-report=term-missing"])
     if args.parallel:
         options.extend(["-n", "auto"])
     if args.stop_on_failure:

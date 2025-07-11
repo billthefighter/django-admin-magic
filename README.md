@@ -1,10 +1,10 @@
-# Django Auto Admin
+# Django Admin Magic
 
-[![Tests](.github/badges/tests-badge.svg)](https://github.com/lucaswhipple/django-auto-admin/actions)
-[![Coverage](.github/badges/coverage-badge.svg)](https://codecov.io/gh/lucaswhipple/django-auto-admin)
-[![PyPI version](https://badge.fury.io/py/django-auto-admin.svg)](https://badge.fury.io/py/django-auto-admin)
-[![Python versions](https://img.shields.io/pypi/pyversions/django-auto-admin.svg)](https://pypi.org/project/django-auto-admin/)
-[![Django versions](https://img.shields.io/pypi/djversions/django-auto-admin.svg)](https://pypi.org/project/django-auto-admin/)
+[![Tests](.github/badges/tests-badge.svg)](https://github.com/lucaswhipple/django-admin-magic/actions)
+[![Coverage](.github/badges/coverage-badge.svg)](https://codecov.io/gh/lucaswhipple/django-admin-magic)
+[![PyPI version](https://badge.fury.io/py/django-admin-magic.svg)](https://badge.fury.io/py/django-admin-magic)
+[![Python versions](https://img.shields.io/pypi/pyversions/django-admin-magic.svg)](https://pypi.org/project/django-admin-magic/)
+[![Django versions](https://img.shields.io/pypi/djversions/django-admin-magic.svg)](https://pypi.org/project/django-admin-magic/)
 
 A simple Django app to automatically register your models with the admin site.
 
@@ -16,7 +16,7 @@ Sometimes you're working on a django app and you just wanna see the models, and 
 Install the package from PyPI:
 
 ```bash
-pip install django-auto-admin
+pip install django-admin-magic
 ```
 
 Then, add it to your `INSTALLED_APPS` in `settings.py`:
@@ -24,14 +24,14 @@ Then, add it to your `INSTALLED_APPS` in `settings.py`:
 ```python
 INSTALLED_APPS = [
     # ...
-    "django_auto_admin",
+    "django_admin_magic",
     # ...
 ]
 ```
 
 ## Demo
 
-A full-featured demo app is included in this repository to showcase all features of Django Auto Admin, including:
+A full-featured demo app is included in this repository to showcase all features of Django Admin Magic, including:
 - Automatic admin registration for a variety of model types
 - Sample data for all models
 - Auto-generated superuser for instant login
@@ -47,7 +47,7 @@ python demo_app/manage.py runserver
 - Main demo: http://127.0.0.1:8000/
 - Admin: http://127.0.0.1:8000/admin/ (login: `admin` / `admin123`)
 
-See [demo/README.md](demo/README.md) for full demo instructions, troubleshooting, and customization tips.
+See [demo_app/README.md](demo_app/README.md) for full demo instructions, troubleshooting, and customization tips.
 
 ## Configuration
 
@@ -87,7 +87,7 @@ If no configuration is provided in settings, you can manually create registrars 
 
 ```python
 # In your app's admin.py file
-from django_auto_admin.utils import create_auto_admin_registrar
+from django_admin_magic.utils import create_auto_admin_registrar
 
 # Auto-determine app label from current package
 registrar = create_auto_admin_registrar()
@@ -96,11 +96,11 @@ registrar = create_auto_admin_registrar()
 registrar = create_auto_admin_registrar("my_app")
 
 # Or register multiple apps
-from django_auto_admin.utils import create_auto_admin_registrar_for_apps
+from django_admin_magic.utils import create_auto_admin_registrar_for_apps
 registrar = create_auto_admin_registrar_for_apps(["my_app", "another_app"])
 
 # Or register all discovered apps
-from django_auto_admin.utils import create_auto_admin_registrar_for_all_apps
+from django_admin_magic.utils import create_auto_admin_registrar_for_all_apps
 registrar = create_auto_admin_registrar_for_all_apps()
 ```
 
@@ -152,7 +152,7 @@ You can still customize the admin classes after they've been registered. The `Ad
 from django.apps import apps
 
 # Get the registrar instance
-registrar = apps.get_app_config("django_auto_admin").registrar
+registrar = apps.get_app_config("django_admin_magic").registrar
 
 # Get the admin class for a model
 MyModelAdmin = registrar.return_admin_class_for_model(MyModel)

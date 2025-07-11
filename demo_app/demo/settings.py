@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_auto_admin',
+    'django_admin_magic',
     'demo_app',
 ]
 
@@ -94,7 +94,7 @@ STATIC_URL = 'static/'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django Auto Admin Configuration
+# Django Admin Magic Configuration
 AUTO_ADMIN_APP_LABEL = 'demo_app'
 
 # Media files for file uploads

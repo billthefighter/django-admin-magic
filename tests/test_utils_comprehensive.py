@@ -7,7 +7,7 @@ from django.test import RequestFactory
 from django.urls import reverse
 from django.utils.html import format_html
 
-from django_auto_admin.utils import (
+from django_admin_magic.utils import (
     TimeLimitedPaginator,
     get_all_child_classes,
     is_polymorphic_model,

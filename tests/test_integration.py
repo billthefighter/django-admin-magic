@@ -148,7 +148,7 @@ class TestAdminIntegration:
         list_display = admin_class.list_display
         
         # Check that the first field is not a linkify function
-        from django_auto_admin.utils import is_linkify_function
+        from django_admin_magic.utils import is_linkify_function
         
         if len(list_display) > 0:
             first_field = list_display[0]
@@ -194,7 +194,7 @@ class TestAdminIntegration:
         """Test that the TimeLimitedPaginator is used."""
         admin_class = admin_site._registry[SimpleModel]
         
-        from django_auto_admin.utils import TimeLimitedPaginator
+        from django_admin_magic.utils import TimeLimitedPaginator
         assert admin_class.paginator == TimeLimitedPaginator
 
     def test_show_full_result_count_setting(self, admin_site):
@@ -282,7 +282,7 @@ class TestAdminPerformance:
         """Test that TimeLimitedPaginator is used for performance."""
         admin_class = admin_site._registry[SimpleModel]
         
-        from django_auto_admin.utils import TimeLimitedPaginator
+        from django_admin_magic.utils import TimeLimitedPaginator
         assert admin_class.paginator == TimeLimitedPaginator
 
     def test_list_select_related_performance(self, admin_site):

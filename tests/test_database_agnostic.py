@@ -5,7 +5,7 @@ from django.db import connection, connections, models
 from django.test import override_settings
 from django.test.utils import modify_settings
 
-from django_auto_admin.registrar import AdminModelRegistrar
+from django_admin_magic.registrar import AdminModelRegistrar
 from .models import (
     ComplexModel,
     ForeignKeyModel,
@@ -433,7 +433,7 @@ class TestDatabaseBackendSpecific:
         """Test PostgreSQL-specific features if available."""
         if connection.vendor == 'postgresql':
             # Test PostgreSQL-specific features
-            from django_auto_admin.utils import TimeLimitedPaginator
+            from django_admin_magic.utils import TimeLimitedPaginator
             
             # Create test data
             for i in range(50):
@@ -570,7 +570,7 @@ class TestDatabaseAgnosticConfiguration:
 
     def test_settings_work_with_all_backends(self):
         """Test that settings work regardless of database backend."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         
         # These settings should work with any database
         assert hasattr(app_settings, 'APP_LABEL')

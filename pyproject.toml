@@ -3,10 +3,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/django_auto_admin"]
+packages = ["src/django_admin_magic"]
 
 [project]
-name = "django-auto-admin"
+name = "django-admin-magic"
 version = "0.1.0"
 description = "Automatic admin registration for Django projects."
 readme = "README.md"
@@ -34,7 +34,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/lucaswhipple/django-auto-admin"
+Homepage = "https://github.com/lucaswhipple/django-admin-magic"
 
 [project.optional-dependencies]
 dev = [

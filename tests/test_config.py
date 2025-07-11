@@ -2,9 +2,9 @@ import pytest
 from django.conf import settings
 from django.test import override_settings
 
-from django_auto_admin.conf import AppSettings, app_settings
-from django_auto_admin import defaults
-from django_auto_admin.utils import reorder_list_display_to_avoid_linkify_first, linkify
+from django_admin_magic.conf import AppSettings, app_settings
+from django_admin_magic import defaults
+from django_admin_magic.utils import reorder_list_display_to_avoid_linkify_first, linkify
 
 
 @pytest.mark.django_db
@@ -217,14 +217,14 @@ class TestConfiguration:
     def test_reorder_linkify_fields_can_be_disabled(self):
         """Test that REORDER_LINKIFY_FIELDS can be disabled via settings."""
         # Re-import to get updated settings
-        from django_auto_admin.conf import app_settings as updated_settings
+        from django_admin_magic.conf import app_settings as updated_settings
         assert updated_settings.REORDER_LINKIFY_FIELDS is False
 
     @override_settings(AUTO_ADMIN_REORDER_LINKIFY_FIELDS=True)
     def test_reorder_linkify_fields_can_be_enabled(self):
         """Test that REORDER_LINKIFY_FIELDS can be enabled via settings."""
         # Re-import to get updated settings
-        from django_auto_admin.conf import app_settings as updated_settings
+        from django_admin_magic.conf import app_settings as updated_settings
         assert updated_settings.REORDER_LINKIFY_FIELDS is True
 
     def test_reorder_linkify_fields_functionality(self):

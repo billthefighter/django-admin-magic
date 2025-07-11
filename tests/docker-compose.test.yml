@@ -4,9 +4,9 @@ services:
   # PostgreSQL database for testing
   postgres-test:
     image: postgres:15
-    container_name: django_auto_admin_postgres_test
+    container_name: django_admin_magic_postgres_test
     environment:
-      POSTGRES_DB: django_auto_admin_test
+              POSTGRES_DB: django_admin_magic_test
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -14,7 +14,7 @@ services:
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d django_auto_admin_test"]
+              test: ["CMD-SHELL", "pg_isready -U postgres -d django_admin_magic_test"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -24,10 +24,10 @@ services:
   # MySQL database for testing
   mysql-test:
     image: mysql:8.0
-    container_name: django_auto_admin_mysql_test
+    container_name: django_admin_magic_mysql_test
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: django_auto_admin_test
+              MYSQL_DATABASE: django_admin_magic_test
       MYSQL_USER: django
       MYSQL_PASSWORD: django
     ports:
@@ -46,7 +46,7 @@ services:
   # Oracle database for testing (using Oracle Express Edition)
   oracle-test:
     image: container-registry.oracle.com/database/express:21.3.0-xe
-    container_name: django_auto_admin_oracle_test
+    container_name: django_admin_magic_oracle_test
     environment:
       ORACLE_PWD: oracle
       ORACLE_CHARACTERSET: AL32UTF8
@@ -66,7 +66,7 @@ services:
   # Redis for caching tests (optional)
   redis-test:
     image: redis:7-alpine
-    container_name: django_auto_admin_redis_test
+    container_name: django_admin_magic_redis_test
     ports:
       - "6379:6379"
     profiles:

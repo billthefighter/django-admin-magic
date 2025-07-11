@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'polymorphic',
-    'django_auto_admin',
+    'django_admin_magic',
     'tests',
 ]
 
@@ -102,7 +102,7 @@ def get_database_config():
     if db_backend == 'postgresql':
         return {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('POSTGRES_DB', 'django_auto_admin_test'),
+            'NAME': os.environ.get('POSTGRES_DB', 'django_admin_magic_test'),
             'USER': os.environ.get('POSTGRES_USER', 'postgres'),
             'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres'),
             'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
@@ -111,7 +111,7 @@ def get_database_config():
     elif db_backend == 'mysql':
         return {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': os.environ.get('MYSQL_DB', 'django_auto_admin_test'),
+            'NAME': os.environ.get('MYSQL_DB', 'django_admin_magic_test'),
             'USER': os.environ.get('MYSQL_USER', 'root'),
             'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
             'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
@@ -149,7 +149,7 @@ DATABASES.update({
     },
     'postgresql': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'django_auto_admin_test'),
+        'NAME': os.environ.get('POSTGRES_DB', 'django_admin_magic_test'),
         'USER': os.environ.get('POSTGRES_USER', 'postgres'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres'),
         'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
@@ -157,7 +157,7 @@ DATABASES.update({
     },
     'mysql': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('MYSQL_DB', 'django_auto_admin_test'),
+        'NAME': os.environ.get('MYSQL_DB', 'django_admin_magic_test'),
         'USER': os.environ.get('MYSQL_USER', 'root'),
         'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
         'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
@@ -261,7 +261,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'django_auto_admin': {
+        'django_admin_magic': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,

@@ -107,7 +107,7 @@ pytest tests/
 pytest -v tests/
 
 # Run with coverage
-pytest --cov=django_auto_admin --cov-report=html tests/
+pytest --cov=django_admin_magic --cov-report=html tests/
 
 # Run specific test file
 pytest tests/test_registrar.py
@@ -257,7 +257,7 @@ pytest --create-db tests/
 ### Coverage Analysis
 ```bash
 # Generate HTML coverage report
-pytest --cov=django_auto_admin --cov-report=html tests/
+pytest --cov=django_admin_magic --cov-report=html tests/
 
 # View coverage in browser
 open htmlcov/index.html
@@ -324,7 +324,7 @@ pytest --pythonpath=src tests/
 pip install pytest-cov
 
 # Run with coverage
-pytest --cov=django_auto_admin tests/
+pytest --cov=django_admin_magic tests/
 ```
 
 ### Getting Help

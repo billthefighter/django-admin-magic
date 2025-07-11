@@ -178,4 +178,4 @@ def admin_site():
 def registrar():
     """Provide access to the AdminModelRegistrar instance."""
     from django.apps import apps
-    return apps.get_app_config("django_auto_admin").registrar 
+    return apps.get_app_config("django_admin_magic").registrar 

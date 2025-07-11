@@ -8,7 +8,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "polymorphic",
-    "django_auto_admin.apps.DjangoAutoAdminConfig",
+    "django_admin_magic.apps.DjangoAutoAdminConfig",
     "tests.apps.TestsConfig",
 ]
 

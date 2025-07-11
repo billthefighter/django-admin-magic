@@ -3,8 +3,8 @@ from django.apps import apps
 from django.contrib import admin
 from django.test import override_settings
 
-from django_auto_admin.registrar import AdminModelRegistrar
-from django_auto_admin.utils import (
+from django_admin_magic.registrar import AdminModelRegistrar
+from django_admin_magic.utils import (
     create_auto_admin_registrar,
     create_auto_admin_registrar_for_apps,
     create_auto_admin_registrar_for_all_apps,
@@ -160,6 +160,6 @@ class TestModelDiscovery:
         registrar = AdminModelRegistrar(auto_discover=True)
         
         # Check that system apps are not included
-        system_apps = ['django_auto_admin', 'admin', 'auth', 'contenttypes', 'sessions']
+        system_apps = ['django_admin_magic', 'admin', 'auth', 'contenttypes', 'sessions']
         for app in system_apps:
             assert app not in registrar.app_labels 

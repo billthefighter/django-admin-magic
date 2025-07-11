@@ -207,7 +207,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: django_auto_admin_test
+          POSTGRES_DB: django_admin_magic_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
@@ -216,7 +216,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run PostgreSQL tests
         env:
-          POSTGRES_DB: django_auto_admin_test
+          POSTGRES_DB: django_admin_magic_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         run: python run_database_tests.py --database postgresql
@@ -237,7 +237,7 @@ test-postgresql:
   services:
     - postgres:15
   variables:
-    POSTGRES_DB: django_auto_admin_test
+    POSTGRES_DB: django_admin_magic_test
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
   script:

@@ -4,7 +4,7 @@ from .conf import app_settings
 
 
 class DjangoAutoAdminConfig(AppConfig):
-    name = "django_auto_admin"
+    name = "django_admin_magic"
     verbose_name = "Django Auto Admin"
 
     def ready(self):

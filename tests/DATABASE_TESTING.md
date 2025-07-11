@@ -101,10 +101,10 @@ sudo apt-get install postgresql postgresql-contrib
 brew install postgresql
 
 # Create test database
-createdb django_auto_admin_test
+createdb django_admin_magic_test
 
 # Set environment variables
-export POSTGRES_DB=django_auto_admin_test
+export POSTGRES_DB=django_admin_magic_test
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=your_password
 export POSTGRES_HOST=localhost
@@ -121,10 +121,10 @@ sudo apt-get install mysql-server
 brew install mysql
 
 # Create test database
-mysql -u root -p -e "CREATE DATABASE django_auto_admin_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p -e "CREATE DATABASE django_admin_magic_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 # Set environment variables
-export MYSQL_DB=django_auto_admin_test
+export MYSQL_DB=django_admin_magic_test
 export MYSQL_USER=root
 export MYSQL_PASSWORD=your_password
 export MYSQL_HOST=localhost
@@ -138,8 +138,8 @@ export MYSQL_PORT=3306
 
 # Create test database
 sqlplus system/oracle@localhost:1521/XE
-CREATE USER django_auto_admin_test IDENTIFIED BY test_password;
-GRANT CONNECT, RESOURCE TO django_auto_admin_test;
+CREATE USER django_admin_magic_test IDENTIFIED BY test_password;
+GRANT CONNECT, RESOURCE TO django_admin_magic_test;
 EXIT;
 
 # Set environment variables
@@ -158,7 +158,7 @@ The test runner uses environment variables to configure database connections:
 
 #### PostgreSQL
 ```bash
-POSTGRES_DB=django_auto_admin_test
+POSTGRES_DB=django_admin_magic_test
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_HOST=localhost
@@ -167,7 +167,7 @@ POSTGRES_PORT=5432
 
 #### MySQL
 ```bash
-MYSQL_DB=django_auto_admin_test
+MYSQL_DB=django_admin_magic_test
 MYSQL_USER=root
 MYSQL_PASSWORD=root
 MYSQL_HOST=localhost
@@ -266,7 +266,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: django_auto_admin_test
+          POSTGRES_DB: django_admin_magic_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         options: >-
@@ -280,7 +280,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run PostgreSQL tests
         env:
-          POSTGRES_DB: django_auto_admin_test
+          POSTGRES_DB: django_admin_magic_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_HOST: localhost
@@ -293,7 +293,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_DATABASE: django_auto_admin_test
+          MYSQL_DATABASE: django_admin_magic_test
           MYSQL_ROOT_PASSWORD: root
         options: >-
           --health-cmd "mysqladmin ping"
@@ -306,7 +306,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run MySQL tests
         env:
-          MYSQL_DB: django_auto_admin_test
+          MYSQL_DB: django_admin_magic_test
           MYSQL_USER: root
           MYSQL_PASSWORD: root
           MYSQL_HOST: localhost
@@ -330,7 +330,7 @@ test-postgresql:
   services:
     - postgres:15
   variables:
-    POSTGRES_DB: django_auto_admin_test
+    POSTGRES_DB: django_admin_magic_test
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
   script:
@@ -341,7 +341,7 @@ test-mysql:
   services:
     - mysql:8.0
   variables:
-    MYSQL_DATABASE: django_auto_admin_test
+    MYSQL_DATABASE: django_admin_magic_test
     MYSQL_ROOT_PASSWORD: root
   script:
     - python run_database_tests.py --database mysql
@@ -357,7 +357,7 @@ test-mysql:
 sudo systemctl status postgresql
 
 # Check connection
-psql -h localhost -U postgres -d django_auto_admin_test
+psql -h localhost -U postgres -d django_admin_magic_test
 
 # Reset password if needed
 sudo -u postgres psql
@@ -373,7 +373,7 @@ sudo systemctl status mysql
 mysql -u root -p -h localhost
 
 # Create database if missing
-CREATE DATABASE django_auto_admin_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE django_admin_magic_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 #### Oracle Connection Issues
@@ -385,8 +385,8 @@ sqlplus system/oracle@localhost:1521/XE
 lsnrctl status
 
 # Create user if missing
-CREATE USER django_auto_admin_test IDENTIFIED BY test_password;
-GRANT CONNECT, RESOURCE TO django_auto_admin_test;
+CREATE USER django_admin_magic_test IDENTIFIED BY test_password;
+GRANT CONNECT, RESOURCE TO django_admin_magic_test;
 ```
 
 ### Performance Issues

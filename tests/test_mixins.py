@@ -2,7 +2,7 @@ import pytest
 from django.contrib import admin
 from django.db import models
 
-from django_auto_admin.mixins import (
+from django_admin_magic.mixins import (
     AdminDefaultsMixin,
     ListAdmin,
     ListAdminMixin,
@@ -111,7 +111,7 @@ class TestAdminDefaultsMixin:
         """Test that the paginator is set to TimeLimitedPaginator."""
         mixin = AdminDefaultsMixin(SimpleModel)
         
-        from django_auto_admin.utils import TimeLimitedPaginator
+        from django_admin_magic.utils import TimeLimitedPaginator
         assert mixin.paginator == TimeLimitedPaginator
 
 

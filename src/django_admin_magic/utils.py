@@ -127,7 +127,7 @@ def create_auto_admin_registrar(app_label: str = None):
         
     Example:
         # In your app's admin.py file:
-        from django_auto_admin.utils import create_auto_admin_registrar
+        from django_admin_magic.utils import create_auto_admin_registrar
         
         registrar = create_auto_admin_registrar()
         # All models in this app are now registered with the admin site
@@ -154,7 +154,7 @@ def create_auto_admin_registrar_for_apps(app_labels: list[str]):
         
     Example:
         # In your admin.py file:
-        from django_auto_admin.utils import create_auto_admin_registrar_for_apps
+        from django_admin_magic.utils import create_auto_admin_registrar_for_apps
         
         registrar = create_auto_admin_registrar_for_apps(['myapp1', 'myapp2'])
     """
@@ -172,7 +172,7 @@ def create_auto_admin_registrar_for_all_apps():
         
     Example:
         # In your admin.py file:
-        from django_auto_admin.utils import create_auto_admin_registrar_for_all_apps
+        from django_admin_magic.utils import create_auto_admin_registrar_for_all_apps
         
         registrar = create_auto_admin_registrar_for_all_apps()
     """

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test runner script for Django Auto Admin.
+Test runner script for Django Admin Magic.
 
 This script provides an easy way to run the comprehensive test suite
 with various options for different testing scenarios.
@@ -49,7 +49,7 @@ def run_tests_with_options(options):
     
     # Add coverage
     if options.coverage:
-        cmd.extend(["--cov=django_auto_admin", "--cov-report=term-missing", "--cov-report=html"])
+        cmd.extend(["--cov=django_admin_magic", "--cov-report=term-missing", "--cov-report=html"])
     
     # Add specific test files
     if options.test_files:
@@ -131,7 +131,7 @@ def run_all_checks():
 def main():
     """Main function to parse arguments and run tests."""
     parser = argparse.ArgumentParser(
-        description="Django Auto Admin Test Runner",
+        description="Django Admin Magic Test Runner",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

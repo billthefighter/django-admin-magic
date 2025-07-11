@@ -1,8 +1,8 @@
-# Django Auto Admin Demo
+# Django Admin Magic Demo
 
 > **Note:** This demo requires the [uv package manager](https://github.com/astral-sh/uv). Install it from the link or with `curl -Ls https://astral.sh/uv/install.sh | sh`.
 
-This demo showcases the `django-auto-admin` package, which automatically registers your Django models with the admin site.
+This demo showcases the `django-admin-magic` package, which automatically registers your Django models with the admin site.
 
 ## Quick Start
 
@@ -89,11 +89,11 @@ The demo uses the following configuration in `demo/settings.py`:
 ```python
 INSTALLED_APPS = [
     # ... other apps ...
-    'django_auto_admin',
+    'django_admin_magic',
     'demo_app',
 ]
 
-# Django Auto Admin Configuration
+# Django Admin Magic Configuration
 AUTO_ADMIN_APP_LABEL = 'demo_app'
 ```
 
@@ -105,7 +105,7 @@ You can customize the admin classes after they've been registered:
 from django.apps import apps
 
 # Get the registrar instance
-registrar = apps.get_app_config("django_auto_admin").registrar
+registrar = apps.get_app_config("django_admin_magic").registrar
 
 # Get the admin class for a model
 MyModelAdmin = registrar.return_admin_class_for_model(MyModel)
@@ -144,6 +144,6 @@ python setup_demo.py
 
 ## Learn More
 
-- [Django Auto Admin Documentation](../README.md)
+- [Django Admin Magic Documentation](../README.md)
 - [Django Admin Documentation](https://docs.djangoproject.com/en/stable/ref/contrib/admin/)
 - [Django Polymorphic Documentation](https://django-polymorphic.readthedocs.io/) 

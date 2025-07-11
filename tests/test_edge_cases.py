@@ -6,7 +6,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.test import override_settings
 
-from django_auto_admin.registrar import AdminModelRegistrar
+from django_admin_magic.registrar import AdminModelRegistrar
 from .models import (
     ComplexModel,
     ForeignKeyModel,

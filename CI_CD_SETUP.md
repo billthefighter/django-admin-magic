@@ -80,7 +80,7 @@ To test the CI setup locally:
 pip install -e ".[dev]"
 
 # Run tests with coverage
-pytest --cov=src/django_auto_admin --cov-report=xml --cov-report=term-missing
+pytest --cov=src/django_admin_magic --cov-report=xml --cov-report=term-missing
 
 # Run linting
 ruff check .

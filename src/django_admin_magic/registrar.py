@@ -98,8 +98,8 @@ class AdminModelRegistrar:
         """
         discovered_apps = []
         for app_config in apps.get_app_configs():
-            # Skip django_auto_admin itself and other Django system apps
-            if app_config.label in ['django_auto_admin', 'admin', 'auth', 'contenttypes', 'sessions']:
+            # Skip django_admin_magic itself and other Django system apps
+            if app_config.label in ['django_admin_magic', 'admin', 'auth', 'contenttypes', 'sessions']:
                 continue
             
             # Check if the app has any models

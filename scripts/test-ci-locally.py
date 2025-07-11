@@ -47,7 +47,7 @@ def main():
         ("pip install -e '.[dev]'", "Installing development dependencies"),
         
         # Run tests with coverage
-        ("pytest --cov=src/django_auto_admin --cov-report=term-missing", "Running tests with coverage"),
+        ("pytest --cov=src/django_admin_magic --cov-report=term-missing", "Running tests with coverage"),
         
         # Run linting
         ("ruff check .", "Running ruff linting"),

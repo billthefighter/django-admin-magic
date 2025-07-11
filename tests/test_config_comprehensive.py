@@ -2,8 +2,8 @@ import pytest
 from django.conf import settings
 from django.test import override_settings
 
-from django_auto_admin.conf import AppSettings
-from django_auto_admin import defaults
+from django_admin_magic.conf import AppSettings
+from django_admin_magic import defaults
 
 
 @pytest.mark.django_db
@@ -145,32 +145,32 @@ class TestConfigurationIntegration:
 
     def test_app_settings_singleton(self):
         """Test that the app_settings singleton works correctly."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         
         # Should be the same instance
-        from django_auto_admin.conf import app_settings as app_settings2
+        from django_admin_magic.conf import app_settings as app_settings2
         assert app_settings is app_settings2
 
     def test_app_settings_with_default_prefix(self):
         """Test that the default app_settings uses the correct prefix."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         assert app_settings.prefix == "AUTO_ADMIN_"
 
     @override_settings(AUTO_ADMIN_APP_LABEL="integration_test")
     def test_app_settings_integration_with_django_settings(self):
         """Test that app_settings integrates correctly with Django settings."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         assert app_settings.APP_LABEL == "integration_test"
 
     @override_settings(AUTO_ADMIN_DEFAULT_EXCLUDED_TERMS=["integration", "test"])
     def test_app_settings_integration_with_custom_excluded_terms(self):
         """Test that app_settings integrates correctly with custom excluded terms."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         assert app_settings.DEFAULT_EXCLUDED_TERMS == ["integration", "test"]
 
     def test_app_settings_fallback_to_defaults(self):
         """Test that app_settings falls back to defaults when Django settings are not set."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         
         # In our test environment, APP_LABEL is set to "tests" in test_settings.py
         # So we test that it uses the Django setting when available
@@ -181,7 +181,7 @@ class TestConfigurationIntegration:
 
     def test_app_settings_with_complex_settings(self):
         """Test that app_settings handles complex settings correctly."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         
         # Test with list settings
         assert isinstance(app_settings.DEFAULT_EXCLUDED_TERMS, list)
@@ -312,7 +312,7 @@ class TestConfigurationDocumentation:
 
     def test_configuration_documentation_consistency(self):
         """Test that configuration behavior matches documentation."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         
         # Test that all documented settings are accessible
         documented_settings = [
@@ -327,12 +327,12 @@ class TestConfigurationDocumentation:
 
     def test_default_values_documentation_consistency(self):
         """Test that default values match documentation."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         
         # Test that default values are as documented
         # Note: In test environment, APP_LABEL might be set to 'tests' by test settings
         # We need to check the actual default value from defaults module
-        from django_auto_admin import defaults
+        from django_admin_magic import defaults
         assert defaults.APP_LABEL is None
         assert isinstance(app_settings.DEFAULT_EXCLUDED_TERMS, list)
         assert isinstance(app_settings.DEFAULT_DO_NOT_REGISTER_FILTER_STRING_LIST, list)
@@ -340,7 +340,7 @@ class TestConfigurationDocumentation:
 
     def test_prefix_documentation_consistency(self):
         """Test that prefix behavior matches documentation."""
-        from django_auto_admin.conf import app_settings
+        from django_admin_magic.conf import app_settings
         
         # Test that the default prefix is as documented
         assert app_settings.prefix == "AUTO_ADMIN_" 

@@ -1,1 +1,0 @@
-default_app_config = "django_auto_admin.apps.DjangoAutoAdminConfig" 

@@ -71,9 +71,9 @@ The pipeline automatically generates these badges:
 
 - **Tests**: ![Tests](.github/badges/tests-badge.svg)
 - **Coverage**: ![Coverage](.github/badges/coverage-badge.svg)
-- **PyPI Version**: [![PyPI version](https://badge.fury.io/py/django-auto-admin.svg)](https://badge.fury.io/py/django-auto-admin)
-- **Python Versions**: [![Python versions](https://img.shields.io/pypi/pyversions/django-auto-admin.svg)](https://pypi.org/project/django-auto-admin/)
-- **Django Versions**: [![Django versions](https://img.shields.io/pypi/djversions/django-auto-admin.svg)](https://pypi.org/project/django-auto-admin/)
+- **PyPI Version**: [![PyPI version](https://badge.fury.io/py/django-admin-magic.svg)](https://badge.fury.io/py/django-admin-magic)
+- **Python Versions**: [![Python versions](https://img.shields.io/pypi/pyversions/django-admin-magic.svg)](https://pypi.org/project/django-admin-magic/)
+- **Django Versions**: [![Django versions](https://img.shields.io/pypi/djversions/django-admin-magic.svg)](https://pypi.org/project/django-admin-magic/)
 
 ## Troubleshooting
 
