@@ -3,7 +3,10 @@ name: Publish Python 🐍 distribution 📦 to PyPI
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
+
+permissions:
+  id-token: write
 
 jobs:
   build-and-publish:
@@ -31,4 +34,4 @@ jobs:
         run: uv run python -m build
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1 
+        uses: pypa/gh-action-pypi-publish@release/v1

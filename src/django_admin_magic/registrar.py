@@ -4,10 +4,15 @@ from typing import Any, cast
 
 from django.apps import apps
 from django.contrib import admin
-from django.contrib.admin.exceptions import AlreadyRegistered
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from polymorphic.models import PolymorphicModel, PolymorphicModelBase
+
+# Django compatibility: AlreadyRegistered moved in Django 4.0
+try:
+    from django.contrib.admin.exceptions import AlreadyRegistered
+except ImportError:
+    from django.contrib.admin.sites import AlreadyRegistered
 
 from .conf import app_settings
 from .mixins import ListAdmin, PolymorphicChildListAdmin, PolymorphicParentListAdmin
