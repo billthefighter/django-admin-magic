@@ -9,6 +9,12 @@
 
 A simple Django app to automatically register your models with the admin site.
 
+## What?
+It auto-generates all your admin pages programatically! It's awesome!
+
+## Why?
+Sometimes you're working on a django app and you just wanna see the models, and you don't want to define a brand new admin instance every time, and you just want things to work and look at your data in the admin view. If so, this package is for you!
+
 ## Tested Dependencies
 
 This package is thoroughly tested against the following dependency combinations:
@@ -25,15 +31,14 @@ This package is thoroughly tested against the following dependency combinations:
 
 ### Continuous Integration
 
-Our CI pipeline automatically tests all compatible combinations on every push and pull request. The test matrix includes:
+The test matrix includes:
 - **5 Django versions** (3.2, 4.0, 4.1, 4.2, 5.0)
 - **5 Python versions** (3.8, 3.9, 3.10, 3.11, 3.12)
 - **Code coverage** reporting
 - **Linting** with ruff
 - **Security scanning** with bandit
 
-## Why?
-Sometimes you're working on a django app and you just wanna see the models, and you don't want to define a brand new admin instance every time, and you just want things to work and look at your data in the admin view. If so, this package is for you!
+
 
 ## Installation
 

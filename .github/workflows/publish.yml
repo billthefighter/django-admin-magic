@@ -22,8 +22,9 @@ jobs:
         with:
           version: "latest"
 
-      - name: Install build tools
+      - name: Create virtual environment and install build tools
         run: |
+          uv venv
           uv pip install build
 
       - name: Build package
