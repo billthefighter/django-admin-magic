@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Callable
-from typing import Any, Union, cast
+from typing import Any, Union, cast, List, Optional
 
 from django.apps import apps
 from django.contrib import admin
@@ -41,20 +41,126 @@ class AdminModelRegistrar:
     They need to be syncd! And the sync code needs to be updated to sync changes from the instance to the admin class prototype.
     """
 
-    def __init__(self, app_label: str):
+    def __init__(self, app_label: Optional[str] = None, app_labels: Optional[List[str]] = None, auto_discover: bool = False):
         """
-        Initialize the registrar for a specific Django app.
+        Initialize the registrar for specific Django app(s).
 
         Args:
-            app_label (str): The label of the Django app to register models for.
+            app_label (str, optional): The label of a single Django app to register models for.
+            app_labels (List[str], optional): List of Django app labels to register models for.
+            auto_discover (bool): Whether to auto-discover and register all installed apps.
         """
         self.class_dict: dict[str, tuple[InclusiveModelType, AdminClassType]] = {}
-        self.app_label = app_label
-        # Convert to list to avoid type errors
-        self.models: list[type[models.Model]] = list(apps.get_app_config(app_label=self.app_label).get_models())
+        self.app_labels = self._determine_app_labels(app_label, app_labels, auto_discover)
         self.do_not_register_filter_string_list = app_settings.DEFAULT_DO_NOT_REGISTER_FILTER_STRING_LIST
+        self.models = []
+        self._collect_models()
         self.model_iterator()
         self.register_models()
+
+    def _determine_app_labels(self, app_label: Optional[str], app_labels: Optional[List[str]], auto_discover: bool) -> List[str]:
+        """
+        Determine which app labels to use based on the provided parameters and settings.
+        
+        Priority order:
+        1. Explicitly provided app_label or app_labels
+        2. Settings configuration (APP_LABEL, APP_LABELS, AUTO_DISCOVER_ALL_APPS)
+        3. Auto-discovery if enabled
+        """
+        # If explicit parameters are provided, use them
+        if app_label:
+            return [app_label]
+        if app_labels:
+            return app_labels
+        
+        # Check settings
+        if hasattr(app_settings, 'APP_LABEL') and app_settings.APP_LABEL:
+            if isinstance(app_settings.APP_LABEL, list):
+                return app_settings.APP_LABEL
+            return [app_settings.APP_LABEL]
+        
+        if hasattr(app_settings, 'APP_LABELS') and app_settings.APP_LABELS:
+            return app_settings.APP_LABELS
+        
+        # Auto-discovery
+        if auto_discover or (hasattr(app_settings, 'AUTO_DISCOVER_ALL_APPS') and app_settings.AUTO_DISCOVER_ALL_APPS):
+            return self._discover_app_labels()
+        
+        # Default to empty list if nothing is configured
+        return []
+
+    def _discover_app_labels(self) -> List[str]:
+        """
+        Discover all Django apps that have models.
+        
+        Returns:
+            List of app labels that have models.
+        """
+        discovered_apps = []
+        for app_config in apps.get_app_configs():
+            # Skip django_auto_admin itself and other Django system apps
+            if app_config.label in ['django_auto_admin', 'admin', 'auth', 'contenttypes', 'sessions']:
+                continue
+            
+            # Check if the app has any models
+            models = app_config.get_models()
+            if models:
+                discovered_apps.append(app_config.label)
+                logger.info(f"Auto-discovered app: {app_config.label} with {len(models)} models")
+        
+        return discovered_apps
+
+    def _collect_models(self):
+        """
+        Collect all models from the specified app labels.
+        """
+        for app_label in self.app_labels:
+            try:
+                app_config = apps.get_app_config(app_label=app_label)
+                app_models = list(app_config.get_models())
+                self.models.extend(app_models)
+                logger.info(f"Collected {len(app_models)} models from app: {app_label}")
+            except LookupError:
+                logger.warning(f"App '{app_label}' not found in installed apps")
+
+    @classmethod
+    def register_all_discovered_apps(cls) -> 'AdminModelRegistrar':
+        """
+        Class method to create a registrar that auto-discovers and registers all apps.
+        
+        This is useful for users who want to register all their models automatically
+        without specifying individual app labels.
+        
+        Returns:
+            AdminModelRegistrar instance configured for auto-discovery
+        """
+        return cls(auto_discover=True)
+
+    @classmethod
+    def register_apps(cls, app_labels: List[str]) -> 'AdminModelRegistrar':
+        """
+        Class method to create a registrar for specific app labels.
+        
+        Args:
+            app_labels: List of app labels to register
+            
+        Returns:
+            AdminModelRegistrar instance configured for the specified apps
+        """
+        return cls(app_labels=app_labels)
+
+    @classmethod
+    def register_app(cls, app_label: str) -> 'AdminModelRegistrar':
+        """
+        Class method to create a registrar for a single app.
+        
+        Args:
+            app_label: The app label to register
+            
+        Returns:
+            AdminModelRegistrar instance configured for the specified app
+        """
+        return cls(app_label=app_label)
 
     def model_iterator(self):
         """
@@ -148,8 +254,9 @@ class AdminModelRegistrar:
             # Check if the field exists on the model OR the admin class
             if field not in model_fields and field not in model_attributes and field not in admin_class_attributes:
                 if isinstance(field, str):
+                    admin_class_name = getattr(admin_class, '__name__', f"AdminClass_{model_class.__name__}")
                     msg = (
-                        f"Field {field} not found in model {model_class.__name__} or admin class {admin_class.__name__}\n"
+                        f"Field {field} not found in model {model_class.__name__} or admin class {admin_class_name}\n"
                         f"Model fields: {model_fields}\n"
                         f"Model attributes: {model_attributes}\n"
                         f"Admin class attributes: {admin_class_attributes}\n"
@@ -159,7 +266,7 @@ class AdminModelRegistrar:
                         msg,
                     )
                 logger.debug(
-                    f"Field {field} not found in model {model_class.__name__} or admin class {admin_class.__name__}",
+                    f"Field {field} not found in model {model_class.__name__} or admin class {getattr(admin_class, '__name__', f'AdminClass_{model_class.__name__}')}",
                 )
 
     def _sync_admin_instance(self, model: InclusiveModelType) -> None:
@@ -376,6 +483,18 @@ class AdminModelRegistrar:
                 is_action=True
             )
         """
+        # Validate method_name
+        if not method_name or not isinstance(method_name, str):
+            raise ValueError("method_name must be a non-empty string")
+        
+        # Validate method_func
+        if method_func is None:
+            raise ValueError("method_func cannot be None")
+        
+        # Validate method_name format (should be a valid Python identifier)
+        if not method_name.replace('_', '').isalnum() or method_name[0].isdigit():
+            raise ValueError("method_name must be a valid Python identifier")
+        
         admin_instance = self.return_admin_class_for_model(model)  # This is the actual live instance
 
         final_wrapped_method: Callable
@@ -445,7 +564,7 @@ class AdminModelRegistrar:
         2. List display and filter properties are properly initialized
         """
         if not self.class_dict:
-            logger.debug(f"No admin classes to register for app {self.app_label}")
+            logger.debug(f"No admin classes to register for app {self.app_labels}")
             return
 
         for name, model_adminclass_tuple in self.class_dict.items():

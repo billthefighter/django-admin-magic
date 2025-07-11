@@ -16,6 +16,7 @@ from .models import (
     ComplexModel,
     ForeignKeyModel,
     GenericForeignKeyModel,
+    ModelWithAddedField,
     ModelWithCustomManager,
     ModelWithProperties,
     ModelWithSearchVector,

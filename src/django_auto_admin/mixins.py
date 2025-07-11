@@ -164,6 +164,16 @@ class ListAdminMixin:
         if app_settings.REORDER_LINKIFY_FIELDS:
             self.list_display = reorder_list_display_to_avoid_linkify_first(self.list_display)
 
+        # Ensure export_as_csv action is available
+        if not hasattr(self, 'actions'):
+            self.actions = []
+        if not isinstance(self.actions, list):
+            self.actions = list(self.actions)
+        
+        # Add export_as_csv action if it's not already there
+        if hasattr(self, 'export_as_csv') and 'export_as_csv' not in self.actions:
+            self.actions.append('export_as_csv')
+
         logger.debug(f"after set_changelist_fields, List display is {self.list_display}")
         logger.debug(f"list_filter is {self.list_filter}")
 
@@ -180,7 +190,7 @@ class AdminDefaultsMixin:
         self.show_full_result_count = False  # Prevent slow COUNT(*) for "Show all" link
 
 
-class ListAdmin(admin.ModelAdmin, ListAdminMixin, AdminDefaultsMixin):
+class ListAdmin(admin.ModelAdmin, ListAdminMixin, AdminDefaultsMixin, ExportCsvMixin):
     def __init__(self, model, admin_site):
         admin.ModelAdmin.__init__(self, model, admin_site)
         ListAdminMixin.__init__(self, model)

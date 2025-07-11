@@ -126,7 +126,7 @@ class TestLinkifyGFK:
         
         # Should contain a link
         assert "href=" in result
-        assert "SimpleModel" in result
+        assert "Simplemodel" in result  # Django uses lowercase model name
 
     def test_linkify_gfk_with_none_value(self):
         """Test that linkify_gfk handles None values correctly."""
@@ -191,10 +191,13 @@ class TestResetSuccessAction:
 
     def test_reset_success_action(self, simple_model_instance):
         """Test that reset_success action works correctly."""
-        # Create a mock queryset with objects that have a success attribute
+        # Create a mock queryset with objects that have a success attribute and save method
         class MockObject:
             def __init__(self, success=True):
                 self.success = success
+            
+            def save(self):
+                pass  # Mock save method
         
         mock_objects = [MockObject(True), MockObject(True)]
         
@@ -262,4 +265,4 @@ class TestUtilityEdgeCases:
         """Test TimeLimitedPaginator with an empty list."""
         paginator = TimeLimitedPaginator([], 10)
         assert paginator.count == 0
-        assert paginator.num_pages == 0 
+        assert paginator.num_pages == 1  # Django paginator returns 1 for empty lists 

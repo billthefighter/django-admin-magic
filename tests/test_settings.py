@@ -21,5 +21,15 @@ DATABASES = {
 
 ROOT_URLCONF = "tests.test_urls"
 
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
 # Add this setting to specify which app to run the auto-admin for.
 AUTO_ADMIN_APP_LABEL = "tests" 

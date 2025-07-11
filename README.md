@@ -1,6 +1,15 @@
 # Django Auto Admin
 
+[![Tests](.github/badges/tests-badge.svg)](https://github.com/lucaswhipple/django-auto-admin/actions)
+[![Coverage](.github/badges/coverage-badge.svg)](https://codecov.io/gh/lucaswhipple/django-auto-admin)
+[![PyPI version](https://badge.fury.io/py/django-auto-admin.svg)](https://badge.fury.io/py/django-auto-admin)
+[![Python versions](https://img.shields.io/pypi/pyversions/django-auto-admin.svg)](https://pypi.org/project/django-auto-admin/)
+[![Django versions](https://img.shields.io/pypi/djversions/django-auto-admin.svg)](https://pypi.org/project/django-auto-admin/)
+
 A simple Django app to automatically register your models with the admin site.
+
+## Why?
+Sometimes you're working on a django app and you just wanna see the models, and you don't want to define a brand new admin instance every time, and you just want things to work and look at your data in the admin view. If so, this package is for you!
 
 ## Installation
 
@@ -42,11 +51,67 @@ See [demo/README.md](demo/README.md) for full demo instructions, troubleshooting
 
 ## Configuration
 
-This library needs to know which of your apps to register models for. Specify the `app_label` in your `settings.py`:
+Django Auto Admin supports multiple ways to specify which apps to register models for:
+
+### Method 1: Single App Label (Traditional)
+
+Specify a single `app_label` in your `settings.py`:
 
 ```python
 AUTO_ADMIN_APP_LABEL = "my_app"
 ```
+
+### Method 2: Multiple App Labels
+
+Specify multiple app labels as a list:
+
+```python
+# Option A: Using APP_LABELS setting
+AUTO_ADMIN_APP_LABELS = ["my_app", "another_app", "third_app"]
+
+# Option B: Using APP_LABEL as a list
+AUTO_ADMIN_APP_LABEL = ["my_app", "another_app", "third_app"]
+```
+
+### Method 3: Auto-Discover All Apps
+
+Automatically discover and register all installed apps that have models:
+
+```python
+AUTO_ADMIN_AUTO_DISCOVER_ALL_APPS = True
+```
+
+### Method 4: Manual Registration in admin.py
+
+If no configuration is provided in settings, you can manually create registrars in your `admin.py` files:
+
+```python
+# In your app's admin.py file
+from django_auto_admin.utils import create_auto_admin_registrar
+
+# Auto-determine app label from current package
+registrar = create_auto_admin_registrar()
+
+# Or specify a specific app label
+registrar = create_auto_admin_registrar("my_app")
+
+# Or register multiple apps
+from django_auto_admin.utils import create_auto_admin_registrar_for_apps
+registrar = create_auto_admin_registrar_for_apps(["my_app", "another_app"])
+
+# Or register all discovered apps
+from django_auto_admin.utils import create_auto_admin_registrar_for_all_apps
+registrar = create_auto_admin_registrar_for_all_apps()
+```
+
+### Configuration Priority
+
+The library follows this priority order for determining which apps to register:
+
+1. Explicitly provided parameters in admin.py files
+2. Settings configuration (`AUTO_ADMIN_APP_LABEL`, `AUTO_ADMIN_APP_LABELS`, `AUTO_ADMIN_AUTO_DISCOVER_ALL_APPS`)
+3. Auto-discovery if enabled
+4. No registration if nothing is configured
 
 ### Advanced Configuration
 
@@ -77,7 +142,7 @@ AUTO_ADMIN_REORDER_LINKIFY_FIELDS = False
 
 ## Usage
 
-Once installed and configured, the library will automatically register all the models in the specified app with the admin site.
+Once installed and configured, the library will automatically register all the models in the specified app(s) with the admin site.
 
 ### Customizing the Admin
 
@@ -109,4 +174,35 @@ MyModelAdmin.list_display.append("my_custom_field")
 
 ## Polymorphic Models
 
-This library automatically detects if `django-polymorphic` is installed and will use the appropriate admin classes for polymorphic models. There is no extra configuration required. 
+This library automatically detects if `django-polymorphic` is installed and will use the appropriate admin classes for polymorphic models. There is no extra configuration required.
+
+## Development
+
+### CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+- **Tests**: Runs across Django 3.2-5.0 and Python 3.8-3.12
+- **Linting**: Code quality checks with ruff
+- **Security**: Automated security scanning with bandit
+- **Deployment**: Automatic PyPI deployment on releases
+- **Badges**: Real-time status badges updated automatically
+
+For setup instructions, see [SETUP_CI_CD.md](SETUP_CI_CD.md).
+
+### Local Development
+
+```bash
+# Install development dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest
+
+# Run linting
+ruff check .
+ruff format .
+
+# Test CI locally
+python scripts/test-ci-locally.py
+``` 

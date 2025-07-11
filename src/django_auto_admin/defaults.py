@@ -1,5 +1,13 @@
-# The app_label of the app to auto-register models for.
+# The app_label(s) of the app(s) to auto-register models for.
+# Can be a single string, a list of strings, or None for auto-discovery
 APP_LABEL = None
+
+# List of app labels to auto-register models for (alternative to APP_LABEL)
+APP_LABELS = []
+
+# Whether to auto-discover and register all installed apps
+# If True, will register models for all Django apps that have models
+AUTO_DISCOVER_ALL_APPS = False
 
 # Terms to exclude from list_display when auto-generating it.
 DEFAULT_EXCLUDED_TERMS = ["_ptr", "uuid", "poly", "baseclass", "basemodel", "histo", "pk", "id", "search"]

@@ -34,10 +34,14 @@ def get_all_child_classes(cls: type) -> list[type]:
 
 
 def is_polymorphic_model(model_class):
+    if model_class is None:
+        return False
     return issubclass(model_class, PolymorphicModel)
 
 
 def is_polymorphic_model_parent_model(cls):
+    if cls is None:
+        return False
     return PolymorphicModel in cls.__bases__
 
 
@@ -107,12 +111,88 @@ def reorder_list_display_to_avoid_linkify_first(list_display):
     return reordered
 
 
+def create_auto_admin_registrar(app_label: str = None):
+    """
+    Create an auto admin registrar for the current app.
+    
+    This function is designed to be used in admin.py files to automatically
+    register all models in the current app with the admin site.
+    
+    Args:
+        app_label (str, optional): The app label to register. If None, will be
+                                 automatically determined from the current package.
+    
+    Returns:
+        AdminModelRegistrar: The registrar instance
+        
+    Example:
+        # In your app's admin.py file:
+        from django_auto_admin.utils import create_auto_admin_registrar
+        
+        registrar = create_auto_admin_registrar()
+        # All models in this app are now registered with the admin site
+    """
+    from .registrar import AdminModelRegistrar
+    
+    if app_label is None:
+        # Auto-determine app label from the current package
+        import __package__
+        app_label = __package__.rsplit(".", 1)[-1]
+    
+    return AdminModelRegistrar.register_app(app_label)
+
+
+def create_auto_admin_registrar_for_apps(app_labels: list[str]):
+    """
+    Create an auto admin registrar for multiple apps.
+    
+    Args:
+        app_labels (list[str]): List of app labels to register
+        
+    Returns:
+        AdminModelRegistrar: The registrar instance
+        
+    Example:
+        # In your admin.py file:
+        from django_auto_admin.utils import create_auto_admin_registrar_for_apps
+        
+        registrar = create_auto_admin_registrar_for_apps(['myapp1', 'myapp2'])
+    """
+    from .registrar import AdminModelRegistrar
+    
+    return AdminModelRegistrar.register_apps(app_labels)
+
+
+def create_auto_admin_registrar_for_all_apps():
+    """
+    Create an auto admin registrar that discovers and registers all apps.
+    
+    Returns:
+        AdminModelRegistrar: The registrar instance
+        
+    Example:
+        # In your admin.py file:
+        from django_auto_admin.utils import create_auto_admin_registrar_for_all_apps
+        
+        registrar = create_auto_admin_registrar_for_all_apps()
+    """
+    from .registrar import AdminModelRegistrar
+    
+    return AdminModelRegistrar.register_all_discovered_apps()
+
+
 class TimeLimitedPaginator(Paginator):
     """
     Paginator that enforces a timeout on the count operation.
     If the operations times out, a fake bogus value is
     returned instead.
     """
+
+    def __init__(self, object_list, per_page, orphans=0, allow_empty_first_page=True):
+        # Validate per_page
+        if per_page is not None and (not isinstance(per_page, int) or per_page <= 0):
+            raise ValueError("per_page must be a positive integer or None")
+        super().__init__(object_list, per_page, orphans, allow_empty_first_page)
 
     @cached_property
     def count(self):
@@ -151,7 +231,15 @@ class TimeLimitedPaginator(Paginator):
 
 @admin.action(description="Mark task as unsuccessful")
 def reset_success(modeladmin, request, queryset):
-    queryset.update(success=False)
+    # Handle both QuerySet and list objects
+    if hasattr(queryset, 'update'):
+        queryset.update(success=False)
+    else:
+        # For list objects, update each item individually
+        for item in queryset:
+            if hasattr(item, 'success'):
+                item.success = False
+                item.save()
 
 
 def linkify(field_name):

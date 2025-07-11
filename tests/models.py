@@ -12,6 +12,12 @@ class SimpleModel(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Additional fields for testing
+    custom_field = models.CharField(max_length=100, blank=True)
+    custom_filter = models.CharField(max_length=100, blank=True)
+    custom_search = models.CharField(max_length=100, blank=True)
+    prepended_field = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.name
@@ -281,4 +287,28 @@ class ModelWithCustomManager(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return self.name 
+        return self.name
+
+
+class UniqueModel(SimpleModel):
+    """Model with unique fields for testing constraint handling."""
+    unique_field = models.CharField(max_length=100, unique=True)
+    unique_together_field1 = models.CharField(max_length=100)
+    unique_together_field2 = models.CharField(max_length=100)
+    
+    class Meta:
+        unique_together = [('unique_together_field1', 'unique_together_field2')]
+    
+    def __str__(self):
+        return f"UniqueModel {self.id}: {self.name}"
+
+
+class ModelWithAddedField(models.Model):
+    """Model with added field for testing field addition functionality."""
+    name = models.CharField(max_length=100)
+    added_field = models.CharField(max_length=100, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"ModelWithAddedField {self.id}: {self.name}" 
