@@ -145,7 +145,7 @@ jobs:
 
       - name: Run tests with coverage for badge generation
         run: |
-          uv run pytest --cov=src/django_admin_magic --cov-report=xml:coverage.xml --cov-report=term-missing
+          uv run pytest --cov=src/django_admin_magic --cov-report=xml:coverage.xml --cov-report=term-missing --junit-xml=junit.xml
 
       - name: Install badge generation tools
         run: |
@@ -157,7 +157,7 @@ jobs:
 
       - name: Generate tests badge
         run: |
-          uv run genbadge tests -i coverage.xml -o tests-badge.svg
+          uv run genbadge tests -i junit.xml -o tests-badge.svg
 
       - name: Update badges in README
         run: |
