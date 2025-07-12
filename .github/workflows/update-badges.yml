@@ -5,14 +5,25 @@ on:
     # Run daily at 2 AM UTC
     - cron: "0 2 * * *"
   workflow_dispatch: # Allow manual trigger
+  workflow_call: # Allow other workflows to trigger this
+    inputs:
+      skip_ci:
+        description: "Skip CI trigger to prevent infinite loops"
+        required: false
+        default: "false"
+        type: boolean
 
 jobs:
   update-badges:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
