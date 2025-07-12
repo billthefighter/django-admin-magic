@@ -119,21 +119,9 @@ jobs:
           name: security-report
           path: bandit-report.*
 
-  trigger-badge-update:
-    runs-on: ubuntu-latest
+  update-badges:
+    uses: ./.github/workflows/update-badges.yml
     if: github.ref == 'refs/heads/main'
     needs: [test, lint, security]
-    steps:
-      - name: Trigger badge update workflow
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'update-badges.yml',
-              ref: context.ref,
-              inputs: {
-                skip_ci: 'true'
-              }
-            });
+    with:
+      skip_ci: true
