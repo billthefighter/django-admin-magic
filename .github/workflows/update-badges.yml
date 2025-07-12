@@ -46,7 +46,7 @@ jobs:
           echo "Listing files before tests:"
           ls -la
           echo "Running pytest..."
-          uv run pytest --cov=src/django_admin_magic --cov-report=xml:coverage.xml --cov-report=term-missing -v
+          uv run pytest --cov=src/django_admin_magic --cov-report=xml:coverage.xml --cov-report=term-missing --junit-xml=junit.xml -v
           echo "Listing files after tests:"
           ls -la
           echo "Looking for coverage files:"
@@ -71,7 +71,12 @@ jobs:
           mkdir -p .github/badges
           ls -la
           uv run genbadge coverage -i coverage.xml -o .github/badges/coverage-badge.svg
-          uv run genbadge tests -i coverage.xml -o .github/badges/tests-badge.svg
+          # Generate tests badge from junit.xml if it exists, otherwise skip
+          if [ -f junit.xml ]; then
+            uv run genbadge tests -i junit.xml -o .github/badges/tests-badge.svg
+          else
+            echo "junit.xml not found, skipping tests badge generation"
+          fi
 
       - name: Commit and push badge updates
         run: |
