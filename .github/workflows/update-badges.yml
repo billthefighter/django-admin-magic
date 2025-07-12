@@ -11,7 +11,7 @@ on:
         description: "Skip CI trigger to prevent infinite loops"
         required: false
         default: "false"
-        type: boolean
+        type: string
 
 jobs:
   update-badges:

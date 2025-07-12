@@ -123,5 +123,8 @@ jobs:
     uses: ./.github/workflows/update-badges.yml
     if: github.ref == 'refs/heads/main'
     needs: [test, lint, security]
+    permissions:
+      contents: write
+      pull-requests: write
     with:
-      skip_ci: true
+      skip_ci: "true"
