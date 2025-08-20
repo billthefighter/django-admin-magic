@@ -26,6 +26,56 @@ InclusiveModelType = type[models.Model] | models.Model | PolymorphicModelBase | 
 AdminClassType = type[PolymorphicParentListAdmin] | type[PolymorphicChildListAdmin] | type[ListAdmin]
 
 
+class NoOpRegistrar:
+    """
+    Registrar that performs no operations.
+
+    Used when auto-registration is disabled (e.g., during migrations or when admin
+    is not installed). Provides the same API surface as the real registrar but
+    all methods are safe no-ops to avoid import-time side effects.
+    """
+
+    def __init__(self, app_label: str | None = None, app_labels: list[str] | None = None, auto_discover: bool = False):
+        self.app_labels = []
+
+    @classmethod
+    def register_all_discovered_apps(cls) -> "NoOpRegistrar":
+        return cls(auto_discover=True)
+
+    @classmethod
+    def register_apps(cls, app_labels: list[str]) -> "NoOpRegistrar":
+        return cls(app_labels=app_labels)
+
+    @classmethod
+    def register_app(cls, app_label: str) -> "NoOpRegistrar":
+        return cls(app_label=app_label)
+
+    # Common mutator methods are implemented as no-ops
+    def register_models(self):
+        return None
+
+    def return_admin_class_for_model(self, model: InclusiveModelType):
+        raise KeyError("Auto admin registration is disabled; no admin classes are available.")
+
+    def add_search_fields(self, *args, **kwargs):
+        return None
+
+    def append_list_display(self, *args, **kwargs):
+        return None
+
+    def prepend_list_display(self, *args, **kwargs):
+        return None
+
+    def remove_list_display(self, *args, **kwargs):
+        return None
+
+    def append_filter_display(self, *args, **kwargs):
+        return None
+
+    def append_inline(self, *args, **kwargs):
+        return None
+
+
 class AdminModelRegistrar:
     """
     Class that handles the registration and configuration of Django admin classes for models.

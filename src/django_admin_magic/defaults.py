@@ -9,6 +9,16 @@ APP_LABELS = []
 # If True, will register models for all Django apps that have models
 AUTO_DISCOVER_ALL_APPS = False
 
+# Global kill-switch to disable auto admin registration entirely
+DISABLED = False
+
+# Skip auto registration for these Django management commands
+# This prevents crashes during migrations and similar non-admin contexts
+SKIP_COMMANDS = ["makemigrations", "migrate"]
+
+# If True, disable auto-registration when 'django.contrib.admin' isn't installed
+SKIP_IF_ADMIN_NOT_INSTALLED = True
+
 # Terms to exclude from list_display when auto-generating it.
 DEFAULT_EXCLUDED_TERMS = ["_ptr", "uuid", "poly", "baseclass", "basemodel", "histo", "pk", "id", "search"]
 

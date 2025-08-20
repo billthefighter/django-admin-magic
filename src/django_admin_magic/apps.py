@@ -8,6 +8,17 @@ class DjangoAutoAdminConfig(AppConfig):
     verbose_name = "Django Auto Admin"
 
     def ready(self):
+        # Avoid any registration during disabled contexts (e.g., migrations)
+        try:
+            from .utils import autoreg_disabled
+
+            if autoreg_disabled():
+                self.registrar = None
+                return
+        except Exception:
+            # If utilities cannot be imported safely, fall back to proceeding
+            pass
+
         if "polymorphic" in apps.app_configs:
             from .registrar import PolymorphicAdminModelRegistrar as Registrar
         else:

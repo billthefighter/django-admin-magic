@@ -1,5 +1,9 @@
+import inspect
 import logging
+import os
+import sys
 
+from django.apps import apps as django_apps
 from django.contrib import admin
 from django.core.paginator import Paginator
 from django.db import OperationalError, connection, transaction
@@ -7,6 +11,8 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.html import format_html
 from polymorphic.models import PolymorphicModel
+
+from .conf import app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -133,15 +139,20 @@ def create_auto_admin_registrar(app_label: str = None):
         # All models in this app are now registered with the admin site
 
     """
-    from .registrar import AdminModelRegistrar
+    from .registrar import AdminModelRegistrar, NoOpRegistrar
 
-    if app_label is None:
-        # Auto-determine app label from the current package
-        import __package__
+    if autoreg_disabled():
+        return NoOpRegistrar()
 
-        app_label = __package__.rsplit(".", 1)[-1]
+    inferred_app_label = app_label
+    if inferred_app_label is None:
+        inferred_app_label = infer_current_app_label()
 
-    return AdminModelRegistrar.register_app(app_label)
+    if not inferred_app_label:
+        logger.debug("Unable to infer app label for auto admin registrar; skipping registration.")
+        return NoOpRegistrar()
+
+    return AdminModelRegistrar.register_app(inferred_app_label)
 
 
 def create_auto_admin_registrar_for_apps(app_labels: list[str]):
@@ -161,7 +172,10 @@ def create_auto_admin_registrar_for_apps(app_labels: list[str]):
         registrar = create_auto_admin_registrar_for_apps(['myapp1', 'myapp2'])
 
     """
-    from .registrar import AdminModelRegistrar
+    from .registrar import AdminModelRegistrar, NoOpRegistrar
+
+    if autoreg_disabled():
+        return NoOpRegistrar()
 
     return AdminModelRegistrar.register_apps(app_labels)
 
@@ -180,9 +194,105 @@ def create_auto_admin_registrar_for_all_apps():
         registrar = create_auto_admin_registrar_for_all_apps()
 
     """
-    from .registrar import AdminModelRegistrar
+    from .registrar import AdminModelRegistrar, NoOpRegistrar
+
+    if autoreg_disabled():
+        return NoOpRegistrar()
 
     return AdminModelRegistrar.register_all_discovered_apps()
+
+
+def infer_current_app_label() -> str | None:
+    """
+    Infer the current Django app label from the caller's module using Django's app registry.
+
+    This is safer than relying on '__package__' which may not be set during certain
+    management commands (e.g., migrations) or when imported in unusual contexts.
+    """
+    module_name = None
+    module = None
+    try:
+        current_frame = inspect.currentframe()
+        if current_frame is not None and current_frame.f_back is not None:
+            module = inspect.getmodule(current_frame.f_back)
+            if module is not None:
+                module_name = module.__name__
+    finally:
+        # Help GC with frame references
+        del current_frame
+
+    if module_name:
+        try:
+            app_config = django_apps.get_containing_app_config(module_name)
+            if app_config is not None:
+                return app_config.label
+        except Exception:
+            pass
+
+        # Fallback: try prefix match with installed app configs
+        for config in django_apps.get_app_configs():
+            if module_name.startswith(config.name):
+                return config.label
+
+    # Secondary fallback using module.__package__ if available
+    try:
+        if module is not None and getattr(module, "__package__", None):
+            pkg = module.__package__
+            for config in django_apps.get_app_configs():
+                if pkg.startswith(config.name):
+                    return config.label
+    except Exception:
+        pass
+
+    return None
+
+
+def autoreg_disabled() -> bool:
+    """
+    Determine whether auto admin registration should be disabled for the current context.
+
+    Disables for:
+    - Explicit project setting/env flag
+    - Migrations (makemigrations/migrate) and other configured skip commands
+    - When django.contrib.admin is not installed and configured to skip
+    """
+    # Explicit setting toggle
+    try:
+        if getattr(app_settings, "DISABLED", False):
+            return True
+    except Exception:
+        # If settings are not ready, continue with other checks
+        pass
+
+    # Environment variable overrides
+    if os.environ.get("DJANGO_ADMIN_MAGIC_DISABLE") == "1" or os.environ.get("AUTO_ADMIN_DISABLE") == "1":
+        return True
+
+    # Skip specific management commands
+    cmd = sys.argv[1] if len(sys.argv) > 1 else ""
+    skip_commands = set(getattr(app_settings, "SKIP_COMMANDS", []))
+    if cmd in skip_commands:
+        return True
+
+    # Skip when admin not installed (based on config)
+    try:
+        if getattr(app_settings, "SKIP_IF_ADMIN_NOT_INSTALLED", True) and not django_apps.is_installed(
+            "django.contrib.admin"
+        ):
+            return True
+    except Exception:
+        # apps registry may not be ready yet; fallback to settings
+        try:
+            from django.conf import settings as dj_settings
+
+            if getattr(app_settings, "SKIP_IF_ADMIN_NOT_INSTALLED", True) and (
+                not hasattr(dj_settings, "INSTALLED_APPS") or "django.contrib.admin" not in dj_settings.INSTALLED_APPS
+            ):
+                return True
+        except Exception:
+            pass
+
+    return False
 
 
 class TimeLimitedPaginator(Paginator):
