@@ -10,7 +10,7 @@ name = "django-admin-magic"
 version = "0.1.5"
 description = "Automatic admin registration for Django projects."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [{ name = "Lucas Whipple", email = "billthefighter@gmail.com" }]
 classifiers = [
     "Development Status :: 3 - Alpha",
