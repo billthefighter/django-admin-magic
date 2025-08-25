@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from django.contrib import admin
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -8,11 +10,7 @@ from django.test import override_settings
 
 from django_admin_magic.registrar import AdminModelRegistrar
 
-from .models import (
-    ComplexModel,
-    ForeignKeyModel,
-    SimpleModel,
-)
+from .models import ComplexModel, ForeignKeyModel, SimpleModel
 
 
 @pytest.mark.django_db
@@ -320,6 +318,45 @@ class TestEdgeCaseRegistrar:
         # This would require creating an empty app, which is complex
         # For now, we test that the registrar handles apps gracefully
         pass
+
+    def test_auto_discover_skips_empty_app_and_warns(self, monkeypatch, caplog):
+        """Auto-discovery should skip apps with no models and emit a warning."""
+
+        from django_admin_magic.registrar import AdminModelRegistrar
+
+        class DummyAppConfig:
+            label = "empty_app"
+
+            def get_models(self):
+                # Simulate generator (previously caused len() TypeError)
+                if False:
+                    yield None
+                return iter(())
+
+        # Patch the app configs to only include an empty app
+        monkeypatch.setattr(
+            "django_admin_magic.registrar.apps.get_app_configs",
+            lambda: [DummyAppConfig()],
+        )
+
+        from django.test import override_settings
+
+        with override_settings(
+            AUTO_ADMIN_APP_LABEL=None,
+            AUTO_ADMIN_APP_LABELS=[],
+            AUTO_ADMIN_AUTO_DISCOVER_ALL_APPS=False,
+        ):
+            with caplog.at_level(logging.INFO, logger="django_admin_magic.registrar"):
+                registrar = AdminModelRegistrar(auto_discover=True)
+
+        # No apps should be discovered when they have no models
+        assert registrar.app_labels == []
+
+        # A warning should be emitted for the empty app
+        warnings = [
+            r for r in caplog.records if r.levelname == "WARNING" and "has no models" in r.getMessage()
+        ]
+        assert warnings, "Expected warning for app with no models during auto-discovery"
 
     def test_registrar_with_abstract_models_only(self):
         """Test registrar behavior with an app that has only abstract models."""

@@ -168,10 +168,13 @@ class AdminModelRegistrar:
                 continue
 
             # Check if the app has any models
-            models = app_config.get_models()
-            if models:
+            models_in_app = list(app_config.get_models())
+            if len(models_in_app) > 0:
                 discovered_apps.append(app_config.label)
-                logger.info(f"Auto-discovered app: {app_config.label} with {len(models)} models")
+                logger.info(f"Auto-discovered app: {app_config.label} with {len(models_in_app)} models")
+            else:
+                # Empty apps are not an error; warn and skip to aid debugging
+                logger.warning(f"Auto-discovery: app '{app_config.label}' has no models; skipping")
 
         return discovered_apps
 
@@ -182,7 +185,10 @@ class AdminModelRegistrar:
                 app_config = apps.get_app_config(app_label=app_label)
                 app_models = list(app_config.get_models())
                 self.models.extend(app_models)
-                logger.info(f"Collected {len(app_models)} models from app: {app_label}")
+                if len(app_models) == 0:
+                    logger.warning(f"App '{app_label}' has no models; skipping")
+                else:
+                    logger.info(f"Collected {len(app_models)} models from app: {app_label}")
             except LookupError:
                 logger.warning(f"App '{app_label}' not found in installed apps")
 
