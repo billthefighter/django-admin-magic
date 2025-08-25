@@ -9,6 +9,8 @@
 
 A simple Django app to automatically register your models with the admin site.
 
+Documentation: https://billthefighter.github.io/django-admin-magic/
+
 ## What?
 It auto-generates all your admin pages programatically! It's awesome!
 
