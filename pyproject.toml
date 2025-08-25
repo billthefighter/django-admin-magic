@@ -53,7 +53,7 @@ local_scheme = "node-and-timestamp"
 [project.optional-dependencies]
 
 
-]
+
 dev = [
     "pytest",
     "pytest-django",
