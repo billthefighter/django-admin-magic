@@ -217,8 +217,6 @@ This project uses GitHub Actions for continuous integration and deployment:
 - **Deployment**: Automatic PyPI deployment on releases
 - **Badges**: Real-time status badges updated automatically
 
-For setup instructions, see [SETUP_CI_CD.md](SETUP_CI_CD.md).
-
 ### Local Development
 
 ```bash
