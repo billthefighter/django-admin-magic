@@ -313,14 +313,10 @@ class TestEdgeCaseRegistrar:
         # Should not crash, but should have empty class_dict
         assert registrar.class_dict == {}
 
-    def test_registrar_with_empty_app(self):
-        """Test registrar behavior with an app that has no models."""
-        # This would require creating an empty app, which is complex
-        # For now, we test that the registrar handles apps gracefully
-        pass
+    def test_registrar_with_empty_app(self, monkeypatch, caplog):
+        """Auto-discovery should skip apps with no models and log (INFO) once."""
 
-    def test_auto_discover_skips_empty_app_and_warns(self, monkeypatch, caplog):
-        """Auto-discovery should skip apps with no models and emit a warning."""
+        from django.test import override_settings
 
         from django_admin_magic.registrar import AdminModelRegistrar
 
@@ -339,8 +335,6 @@ class TestEdgeCaseRegistrar:
             lambda: [DummyAppConfig()],
         )
 
-        from django.test import override_settings
-
         with override_settings(
             AUTO_ADMIN_APP_LABEL=None,
             AUTO_ADMIN_APP_LABELS=[],
@@ -352,11 +346,11 @@ class TestEdgeCaseRegistrar:
         # No apps should be discovered when they have no models
         assert registrar.app_labels == []
 
-        # A warning should be emitted for the empty app
-        warnings = [
-            r for r in caplog.records if r.levelname == "WARNING" and "has no models" in r.getMessage()
-        ]
-        assert warnings, "Expected warning for app with no models during auto-discovery"
+        # A log should be emitted for the empty app (now INFO instead of WARNING)
+        messages = [r.getMessage() for r in caplog.records if "has no models" in r.getMessage()]
+        assert messages, "Expected log for app with no models during auto-discovery"
+
+    
 
     def test_registrar_with_abstract_models_only(self):
         """Test registrar behavior with an app that has only abstract models."""

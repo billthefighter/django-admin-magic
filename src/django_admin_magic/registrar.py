@@ -173,8 +173,8 @@ class AdminModelRegistrar:
                 discovered_apps.append(app_config.label)
                 logger.info(f"Auto-discovered app: {app_config.label} with {len(models_in_app)} models")
             else:
-                # Empty apps are not an error; warn and skip to aid debugging
-                logger.warning(f"Auto-discovery: app '{app_config.label}' has no models; skipping")
+                # Empty apps during auto-discovery are normal; log at INFO to avoid noisy warnings
+                logger.info(f"Auto-discovery: app '{app_config.label}' has no models; skipping")
 
         return discovered_apps
 

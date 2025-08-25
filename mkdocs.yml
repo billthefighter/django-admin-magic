@@ -1,5 +1,5 @@
-site_name: Pydantic2Django
-site_description: Convert Pydantic models to Django models dynamically
+site_name: Django Admin Magic
+site_description: Automatically register and customize Django Admin for your models
 
 # When publishing to GitHub Pages, this will be set by the action
 # site_url can be added later if desired
@@ -56,14 +56,12 @@ plugins:
   - search
   - api-autonav:
       modules:
-        - src/pydantic2django
-      nav_section_title: "API"
+        - src/django_admin_magic
+      nav_section_title: "API Reference"
       api_root_uri: "reference"
       exclude_private: true
   - awesome-nav
   - autorefs
-  - mermaid2
-  - mike
   - mkdocstrings:
       handlers:
         python:
