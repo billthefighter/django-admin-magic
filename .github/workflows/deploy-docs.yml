@@ -22,17 +22,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
 
       - name: Install docs dependencies
         run: uv sync --group docs
-
-      - name: Symlink Markdown files from src into docs
-        if: ${{ hashFiles('scripts/sync_src_markdown.py') != '' }}
-        run: uv run python scripts/sync_src_markdown.py
 
       - name: Configure Git identity for CI
         run: |

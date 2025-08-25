@@ -54,14 +54,7 @@ docs_dir: docs
 
 plugins:
   - search
-  - api-autonav:
-      modules:
-        - src/django_admin_magic
-      nav_section_title: "API Reference"
-      api_root_uri: "reference"
-      exclude_private: true
   - awesome-nav
-  - autorefs
   - mkdocstrings:
       handlers:
         python:
