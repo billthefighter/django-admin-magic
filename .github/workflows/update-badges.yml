@@ -78,10 +78,14 @@ jobs:
             echo "junit.xml not found, skipping tests badge generation"
           fi
 
-      - name: Commit and push badge updates
+      - name: Commit and push badge updates (if changed)
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add .github/badges/
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update badges [skip ci]"
-          git push
+          git add -A .github/badges/
+          if git diff --cached --quiet -- .github/badges; then
+            echo "No badge changes to commit."
+          else
+            git commit -m "Update badges [skip ci]"
+            git push
+          fi
