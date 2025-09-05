@@ -31,3 +31,11 @@ ADMIN_TUPLE_ATTRIBUTES_TO_LIST = ["list_display", "list_filter", "search_fields"
 # Whether to reorder linkify fields to avoid them being first in list_display
 # This prevents issues with clicking on the first column in admin changelist views
 REORDER_LINKIFY_FIELDS = True
+
+# Many-to-many rendering in changelist
+# Enable/disable automatic M2M column rendering with linkified items
+M2M_LIST_ENABLED = True
+# Maximum number of related objects to render per row before clipping with "..."
+M2M_LIST_MAX_ITEMS = 10
+# Attribute on related object to display; "__str__" uses str(obj)
+M2M_LIST_DISPLAY_ATTR = "__str__"

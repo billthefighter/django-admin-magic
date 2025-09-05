@@ -19,6 +19,11 @@ Django Admin Magic reads settings via the `AUTO_ADMIN_` prefix. These map to def
 - **AUTO_ADMIN_ADMIN_TUPLE_ATTRIBUTES_TO_LIST**: attributes coerced to lists so they can be mutated (default: `list_display`, `list_filter`, `search_fields`, `readonly_fields`).
 - **AUTO_ADMIN_REORDER_LINKIFY_FIELDS**: bool. Avoids a linkified field being first in changelist to prevent checkbox conflicts. Default: `True`.
 
+## Many-to-many rendering
+- **AUTO_ADMIN_M2M_LIST_ENABLED**: bool. Enable M2M fields in changelist with linkified items. Default: `True`.
+- **AUTO_ADMIN_M2M_LIST_MAX_ITEMS**: int. Max related objects to display per row before clipping with `...`. Default: `10`.
+- **AUTO_ADMIN_M2M_LIST_DISPLAY_ATTR**: string. Attribute on related object to display. Use `"__str__"` for the string representation. Supports dotted paths (e.g., `"profile.name"`). Default: `"__str__"`.
+
 ## Registrar helpers
 You can bypass settings and specify apps directly from `admin.py` using:
 ```python

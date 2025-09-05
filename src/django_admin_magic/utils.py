@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 from django.db import OperationalError, connection, transaction
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from polymorphic.models import PolymorphicModel
 
 from .conf import app_settings
@@ -69,7 +69,7 @@ def is_linkify_function(field):
     func_name = getattr(field, "__name__", "")
 
     # Check for the specific function names used in linkify functions
-    if func_name in ("_linkify", "_linkify_gfk"):
+    if func_name in ("_linkify", "_linkify_gfk", "_linkify_m2m"):
         return True
 
     # Additional check: look for the short_description attribute which is set on linkify functions
@@ -436,3 +436,83 @@ def linkify_gfk(field_name):
     except AttributeError:
         logger.warning(f"Could not set admin attributes on linkify_gfk function for {field_name}")
     return _linkify_gfk
+
+
+def linkify_m2m(field_name):
+    """
+    Render a ManyToMany field as a comma-separated list of linkified related objects.
+
+    - Respects configured limit via app settings (M2M_LIST_MAX_ITEMS)
+    - Uses configured display attribute (M2M_LIST_DISPLAY_ATTR), defaulting to __str__
+    - Falls back gracefully if admin URL cannot be reversed
+    - Clips with an ellipsis when more than the configured limit
+    """
+
+    def _resolve_display_text(related_obj):
+        display_attr = getattr(app_settings, "M2M_LIST_DISPLAY_ATTR", "__str__")
+        if display_attr == "__str__":
+            return str(related_obj)
+        # Support dotted path attributes, e.g., "profile.name"
+        try:
+            value = related_obj
+            for part in str(display_attr).split("."):
+                value = getattr(value, part)
+            return str(value)
+        except Exception:
+            return str(related_obj)
+
+    def _maybe_link(related_obj, text):
+        try:
+            if not hasattr(related_obj, "_meta") or getattr(related_obj, "pk", None) is None:
+                return text
+            app_label = related_obj._meta.app_label
+            model_name = related_obj._meta.model_name
+            view_name = f"admin:{app_label}_{model_name}_change"
+            link_url = reverse(view_name, args=[related_obj.pk])
+            return format_html('<a href="{}">{}</a>', link_url, text)
+        except Exception:
+            return text
+
+    def _linkify_m2m(obj):
+        try:
+            manager = getattr(obj, field_name)
+        except Exception:
+            return "-"
+
+        try:
+            queryset = manager.all()
+        except Exception:
+            return "-"
+
+        max_items = getattr(app_settings, "M2M_LIST_MAX_ITEMS", 10) or 10
+        items = list(queryset[: max_items + 1])
+        has_more = len(items) > max_items
+        items = items[:max_items]
+
+        if not items:
+            return "-"
+
+        display_nodes = [_maybe_link(related, _resolve_display_text(related)) for related in items]
+
+        # Join with comma+space safely
+        rendered = (
+            display_nodes[0]
+            if len(display_nodes) == 1
+            else format_html_join(
+                ", ",
+                "{}",
+                ((node,) for node in display_nodes),
+            )
+        )
+
+        if has_more:
+            rendered = format_html("{}{}", rendered, " ...")
+        return rendered
+
+    desc = field_name.replace("_", " ").title()
+    try:
+        _linkify_m2m.short_description = desc
+        # M2M not sortable by default
+    except AttributeError:
+        logger.warning(f"Could not set admin attributes on linkify_m2m for {field_name}")
+    return _linkify_m2m

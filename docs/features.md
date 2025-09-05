@@ -9,6 +9,7 @@
 - `list_display` built from model fields, with exclusions from `DEFAULT_EXCLUDED_TERMS`
 - Relation fields are displayed with clickable links via `linkify()`
 - GenericForeignKeys displayed via `linkify_gfk()`
+- Many-to-many fields rendered as comma-separated, linkified items with clipping (see below)
 - Common filters auto-added for booleans, datetimes, and chars
 - Properties on the model are appended if safe and unique
 - Created/updated timestamp fields moved to end
@@ -36,3 +37,10 @@
   - `add_admin_method` (actions and display functions)
 
 See Usage for examples.
+
+## Many-to-many handling
+- Detail view uses Django's default M2M form widget; nothing custom to learn
+- Changelist shows M2M fields as a comma-separated list of related objects
+  - Each item links to the related object's admin change page (when registered)
+  - Displays up to a configurable limit (default: 10); extra items are clipped with `...`
+  - Works with explicit `through` tables; the end objects are shown

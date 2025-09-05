@@ -283,3 +283,25 @@ class ModelWithAddedField(models.Model):
 
     def __str__(self):
         return f"ModelWithAddedField {self.id}: {self.name}"
+
+
+# Models to test explicit through ManyToMany handling
+class M2MTarget(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"Target-{self.name}"
+
+
+class WithThrough(models.Model):
+    name = models.CharField(max_length=100)
+    targets = models.ManyToManyField("M2MTarget", through="ThroughLink", related_name="with_throughs")
+
+    def __str__(self):
+        return f"WithThrough-{self.name}"
+
+
+class ThroughLink(models.Model):
+    left = models.ForeignKey(WithThrough, on_delete=models.CASCADE)
+    right = models.ForeignKey(M2MTarget, on_delete=models.CASCADE)
+    note = models.CharField(max_length=50, blank=True)

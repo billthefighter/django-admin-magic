@@ -13,18 +13,11 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.test import RequestFactory
 
-from .models import (
-    ComplexModel,
-    ForeignKeyModel,
-    GenericForeignKeyModel,
-    ModelWithCustomManager,
-    ModelWithProperties,
-    ModelWithSearchVector,
-    PolymorphicChildA,
-    PolymorphicChildB,
-    PolymorphicParent,
-    SimpleModel,
-)
+from .models import (ComplexModel, ForeignKeyModel, GenericForeignKeyModel,
+                     M2MTarget, ModelWithCustomManager, ModelWithProperties,
+                     ModelWithSearchVector, PolymorphicChildA,
+                     PolymorphicChildB, PolymorphicParent, SimpleModel,
+                     WithThrough)
 
 
 @pytest.fixture

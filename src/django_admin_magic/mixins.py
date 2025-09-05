@@ -14,6 +14,7 @@ from .utils import (
     get_all_child_classes,
     linkify,
     linkify_gfk,
+    linkify_m2m,
     reorder_list_display_to_avoid_linkify_first,
 )
 
@@ -133,7 +134,7 @@ class ListAdminMixin:
             if not any(term in gfk_name.casefold() for term in excluded_terms):
                 self.list_display.append(linkify_gfk(gfk_name))
 
-        # Add other fields
+        # Add other fields (non-M2M concrete fields)
         for field in modelfields:
             # Skip fields that are part of a GFK we just added
             if field.name in self.gfk_constituent_fields:
@@ -155,6 +156,17 @@ class ListAdminMixin:
                     models.BooleanField | models.DateTimeField | models.CharField,
                 ):
                     self.list_filter.append(field.name)
+
+        # Add many-to-many relations (forward only), if enabled
+        try:
+            if getattr(app_settings, "M2M_LIST_ENABLED", True):
+                for rel_field in self.model._meta.get_fields():
+                    if getattr(rel_field, "many_to_many", False) and not getattr(rel_field, "auto_created", False):
+                        if not any(term in rel_field.name.casefold() for term in excluded_terms):
+                            self.list_display.append(linkify_m2m(rel_field.name))
+        except Exception:
+            # If inspection fails, skip M2M enhancement silently
+            pass
 
         # Add properties to list_display
         for prop_name in self.properties:

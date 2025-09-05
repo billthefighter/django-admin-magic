@@ -26,3 +26,17 @@ class MyAdmin(admin.ModelAdmin):
 ```
 
 This paginator is also applied by default through the admin mixins.
+
+## linkify_m2m(field_name)
+Render a ManyToMany field in the changelist as a comma-separated list of linkified related objects.
+
+```python
+from django_admin_magic.utils import linkify_m2m
+
+MyModelAdmin = registrar.return_admin_class_for_model(MyModel)
+MyModelAdmin.list_display += [linkify_m2m("tags")]
+```
+
+- Respects configuration: `AUTO_ADMIN_M2M_LIST_MAX_ITEMS`, `AUTO_ADMIN_M2M_LIST_DISPLAY_ATTR`
+- Clips with `...` when more than the configured limit
+- Works with explicit `through` models (shows the end objects)
