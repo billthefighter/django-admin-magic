@@ -641,14 +641,31 @@ class AdminModelRegistrar:
             logger.debug(f"No admin classes to register for app {self.app_labels}")
             return
 
+        # Ensure any explicit app admin.py registrations are loaded first
+        try:
+            from django.contrib.admin import autodiscover as admin_autodiscover
+
+            admin_autodiscover()
+        except Exception:
+            # Autodiscover may be already executed or unavailable in certain contexts
+            pass
+
         for name, model_adminclass_tuple in self.class_dict.items():
             logger.debug(f"Registering model {name}")
             model, admin_class = model_adminclass_tuple
-            # Check if admin class has a ListAdminMixin as a parent class
+            # Skip registration if already registered by third-party/admin.py
+            try:
+                if admin.site.is_registered(model):  # type: ignore[attr-defined]
+                    logger.info(f"Model {model} already registered; skipping auto-registration")
+                    self._sync_admin_instance(model)
+                    continue
+            except Exception:
+                # Fallback to trying and catching AlreadyRegistered
+                pass
+
             try:
                 admin.site.register(model, admin_class)  # type: ignore
                 self._sync_admin_instance(model)
-
             except AlreadyRegistered:
                 # If already registered, sync the instance
                 self._sync_admin_instance(model)
